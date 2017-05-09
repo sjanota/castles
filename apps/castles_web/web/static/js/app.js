@@ -23,13 +23,9 @@ import "phoenix_html"
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-class Login extends React.Component {
-  render() {
-    return <h2>Hello World!</h2>
-  }
-}
+import { Main } from './components/Main'
 
 ReactDOM.render(
-  <Login />,
+  <Main />,
   document.getElementById('root')
 );
