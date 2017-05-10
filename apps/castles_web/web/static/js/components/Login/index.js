@@ -1,35 +1,14 @@
 import React from 'react'
-import { Field, ErrorP } from '../Common'
-
-class Debug extends React.Component {
-  constructor() {
-    super();
-    this.toggleError = this.toggleError.bind(this)
-  }
-  render() {
-    return (
-      <div>
-        <button onClick={this.toggleError}>Toggle error</button>
-      </div>
-    );
-  }
-
-  toggleError() {
-    if(this.props.error) {
-      this.props.setError(null)
-    } else {
-      this.props.setError("artificial error")
-    }
-  }
-}
+import { Field, Error, UserInput } from '../Common'
+import { Debug } from './debug'
 
 export class Login extends React.Component {
   constructor() {
     super();
     this.setError = this.setError.bind(this)
     this.state = {
-      error: 'aaa',
-      debug: true
+      error: '',
+      debug: false
     }
   }
 
@@ -38,7 +17,14 @@ export class Login extends React.Component {
       <div className="login">
         <h3>Login</h3>
         {this.state.debug ? this.debug() : ''}
-        {this.state.error ? <ErrorP value={this.state.error}/> : ''}
+
+        <p>
+          <UserInput
+            name="Login"
+          />
+          {this.state.error ? <Error value={this.state.error}/> : ''}
+        </p>
+        <button>Login</button>
       </div>
     );
   }
