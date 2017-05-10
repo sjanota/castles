@@ -49,7 +49,7 @@ export class Main extends React.Component {
   render() {
     return (
       <div>
-        <h2>Hello World!</h2>
+        <h2>Castles!</h2>
         <SwitchPage
           value={this.state.page}
           values={pages}
