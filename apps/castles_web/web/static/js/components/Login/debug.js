@@ -3,21 +3,26 @@ import React from 'react'
 export class Debug extends React.Component {
   constructor() {
     super();
-    this.toggleError = this.toggleError.bind(this)
+    this.toggleShow = this.toggleShow.bind(this)
+    this.state = {
+      show: true
+    }
   }
   render() {
+    const arrow = this.state.show ? '&uarr;' : '&darr;';
     return (
-      <div>
-        <button onClick={this.toggleError}>Toggle error</button>
+      <div className="debug">
+        <h4>Debug <button onClick={this.toggleShow}  dangerouslySetInnerHTML={{__html: arrow}} /></h4>
+        <div>
+          {this.state.show ? this.props.children : ''}
+        </div>
       </div>
     );
   }
 
-  toggleError() {
-    if(this.props.error) {
-      this.props.setError(null)
-    } else {
-      this.props.setError("artificial error")
-    }
+  toggleShow() {
+    this.setState(function (prev) {
+      return {show: !prev.show}
+    });
   }
 }

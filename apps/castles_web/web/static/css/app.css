@@ -7,3 +7,32 @@
 .error > .field > .name {
   font-weight: bold;
 }
+
+.debug {
+  margin-bottom: 10px;
+  border-width: 2px 0px 2px 0px;
+  border-style: solid;
+  border-color: #dddddd;
+  background-color: #eeeeee;
+  padding: 5px;
+  font-size: 16px;
+}
+
+.debug > h4 {
+  margin-top: 0px;
+  font-style: italic;
+  font-size: inherit;
+}
+
+.debug > h4 > button {
+  display: inline-block;
+  padding: 0px 5px 0px 5px; /* Padding por defecto */
+  text-align: center;
+  vertical-align: middle;
+
+  height: 20px;
+
+  border: 1px solid #cccccc;
+  -webkit-border-radius: 4px;
+  box-sizing: border-box; /* <- added this */
+}

@@ -8,7 +8,7 @@ export class Login extends React.Component {
     this.setError = this.setError.bind(this)
     this.state = {
       error: '',
-      debug: false
+      debug: true
     }
   }
 
@@ -30,10 +30,18 @@ export class Login extends React.Component {
   }
 
   debug() {
-    return <Debug
-      setError={this.setError}
-      error={this.state.error}
-    />
+    const toggleError = () => {
+      if(this.state.error) {
+        this.setError(null)
+      } else {
+        this.setError("artificial error")
+      }
+    }
+    return (
+      <Debug>
+        <button onClick={toggleError}>Toggle error</button>
+      </Debug>
+    );
   }
 
   setError(err) {
