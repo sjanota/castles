@@ -20,6 +20,6 @@ export function ErrorP(props) {
 
 export function UserInput(props) {
   return (
-    <span className="input"><span className="name">{props.name}:</span> <input className="value">{props.value}</input></span>
+    <span className="input"><span className="name">{props.name}:</span> <input className="value" onChange={props.onChange}>{props.value}</input></span>
   );
 }

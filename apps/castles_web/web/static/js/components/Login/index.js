@@ -6,9 +6,11 @@ export class Login extends React.Component {
   constructor() {
     super();
     this.setError = this.setError.bind(this)
+    this.handleLoginChange = this.handleLoginChange.bind(this)
     this.state = {
       error: '',
-      debug: true
+      debug: true,
+      login: ''
     }
   }
 
@@ -19,14 +21,20 @@ export class Login extends React.Component {
         {this.state.debug ? this.debug() : ''}
 
         <p>
-          <UserInput
-            name="Login"
-          />
+          Login: <input value={this.state.login} onChange={this.handleLoginChange} />
           {this.state.error ? <Error value={this.state.error}/> : ''}
         </p>
         <button>Login</button>
       </div>
     );
+  }
+
+  handleLoginChange(e) {
+    this.setState({login: e.target.value})
+  }
+
+  setError(err) {
+    this.setState({error: err})
   }
 
   debug() {
@@ -39,12 +47,10 @@ export class Login extends React.Component {
     }
     return (
       <Debug>
-        <button onClick={toggleError}>Toggle error</button>
+        <p><button onClick={toggleError}>Toggle error</button></p>
+        <p><Field name="User name" value={this.state.login} /></p>
       </Debug>
     );
   }
 
-  setError(err) {
-    this.setState({error: err})
-  }
 }
