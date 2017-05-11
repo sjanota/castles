@@ -8,6 +8,10 @@
   font-weight: bold;
 }
 
+.login .username-input input {
+  margin-right: 10px;
+}
+
 .debug {
   margin-bottom: 10px;
   border-width: 2px 0px 2px 0px;
@@ -35,4 +39,28 @@
   border: 1px solid #cccccc;
   -webkit-border-radius: 4px;
   box-sizing: border-box; /* <- added this */
+}
+
+.scrollable-list {
+  border: 2px solid;
+  padding: 0px;
+  list-style: none;
+  overflow-y: scroll;
+}
+
+.scrollable-list li {
+  padding: 1px 5px;
+}
+
+.scrollable-list li:hover {
+  background-color: #dddddd;
+}
+
+.scrollable-list li.active {
+  background-color: #ff2020;
+}
+
+.player-list {
+  width: 150px;
+  height: 250px;
 }

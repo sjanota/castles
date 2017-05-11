@@ -4,9 +4,27 @@ import { Lobby } from '../Lobby'
 import { Game } from '../Game'
 import { capitalize } from '../../util'
 
+const playerList = [
+  {name: "aaa"},
+  {name: "bbb"},
+  {name: "ccc"},
+  {name: "ddd"},
+  {name: "eee"},
+  {name: "fff"},
+  {name: "ggg"},
+  {name: "hhh"},
+  {name: "zzz"},
+  {name: "xxx"},
+  {name: "yyy"},
+  {name: "vvv"},
+  {name: "rrr"},
+  {name: "uuu"},
+  {name: "iii"}
+]
+
 const pagesMap = {
   login: <Login />,
-  lobby: <Lobby />,
+  lobby: <Lobby players={playerList}/>,
   game: <Game />
 };
 const pages = Object.keys(pagesMap)
@@ -42,7 +60,7 @@ export class Main extends React.Component {
     super();
     this.setPage = this.setPage.bind(this)
     this.state = {
-      page: pages[0]
+      page: pages[1]
     }
   }
 
