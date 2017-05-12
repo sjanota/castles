@@ -5,26 +5,26 @@ import { Game } from '../Game'
 import { capitalize } from '../../util'
 
 const playerList = [
-  {name: "aaa"},
-  {name: "bbb"},
-  {name: "ccc"},
-  {name: "ddd"},
-  {name: "eee"},
-  {name: "fff"},
-  {name: "ggg"},
-  {name: "hhh"},
-  {name: "zzz"},
-  {name: "xxx"},
-  {name: "yyy"},
-  {name: "vvv"},
-  {name: "rrr"},
-  {name: "uuu"},
-  {name: "iii"}
+  {name: "aaa", points: 123},
+  {name: "bbb", points: 312},
+  {name: "ccc", points: 456},
+  {name: "ddd", points: 5436},
+  {name: "eee", points: 7663},
+  {name: "fff", points: 542352},
+  {name: "ggg", points: 643534},
+  {name: "hhh", points: 4324325},
+  {name: "zzz", points: 53442},
+  {name: "xxx", points: 4324},
+  {name: "yyy", points: 2342},
+  {name: "vvv", points: 42342},
+  {name: "rrr", points: 5435},
+  {name: "uuu", points: 799876},
+  {name: "iii", points: 543}
 ]
 
 const pagesMap = {
-  login: <Login />,
-  lobby: <Lobby players={playerList}/>,
+  login: <Login/>,
+  lobby: <Lobby players={playerList} login="L0g1n"/>,
   game: <Game />
 };
 const pages = Object.keys(pagesMap)
