@@ -61,11 +61,11 @@
 }
 
 .player-list {
-  width: 150px;
-  height: 250px;
+  width: 300px;
+  height: 400px;
 }
 
-#root .container {
+.my-container {
   display: flex;
   justify-content: space-between;
 }

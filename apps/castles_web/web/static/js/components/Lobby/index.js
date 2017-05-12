@@ -21,7 +21,7 @@ export class Lobby extends React.Component {
         <h3>Lobby</h3>
         {this.state.debug ? this.debug() : ''}
         <h4>Logged as '{this.props.login}'</h4>
-        <div className="container">
+        <div className="my-container">
           <PlayerList
             players={this.props.players}
             activePlayerNo={this.state.activePlayer}
