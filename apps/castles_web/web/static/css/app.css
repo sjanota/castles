@@ -1,5 +1,7 @@
 /* This file is for your main application css. */
 
+img {max-width:100%;}
+
 .error {
   color: red;
 }
@@ -68,4 +70,90 @@
 .my-container {
   display: flex;
   justify-content: space-between;
+}
+
+.my-column {
+  display: flex;
+  flex-flow: column;
+  justify-content: space-between;
+}
+
+.board .castle {
+  max-width: 100px;
+  margin: 0px 10px;
+}
+
+.game .status {
+  text-align: center;
+  font-size: 2em;
+  color: red;
+}
+
+.board .player-base .name {
+  font-style: italic;
+  font-weight: bold;
+  font-size: 2em;
+}
+
+.battle-ground {
+  align-content: flex-start;
+}
+
+.board .player-base > div {
+  display: flex;
+}
+
+.army .unit {
+  background-color: #eeeeee;
+}
+
+.army.not-shown .unit {
+  background-color: inherit;
+}
+
+.unit-picker {
+  padding: 5px;
+  border: 3px solid red;
+}
+
+.unit-picker p {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.unit-picker .unit {
+  margin: 5px auto;
+  max-width: 50px;
+}
+
+div.right .my-container {
+  flex-flow: row-reverse;
+}
+
+div.right .align {
+  text-align: right;
+}
+
+div.left .align {
+  text-align: left;
+}
+
+div.right img {
+  transform: scaleX(-1);
+}
+
+div.right .no-mirror img {
+  transform: none;
+}
+
+.army.not-shown img {
+  visibility: hidden;
+}
+
+.unit-picker.not-shown {
+    border: 0px;
+}
+
+.unit-picker.not-shown p {
+  visibility: hidden;
 }

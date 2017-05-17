@@ -60,7 +60,7 @@ export class Main extends React.Component {
     super();
     this.setPage = this.setPage.bind(this)
     this.state = {
-      page: pages[1]
+      page: pages[2]
     }
   }
 
