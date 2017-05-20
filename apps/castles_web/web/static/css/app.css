@@ -93,9 +93,12 @@ img {max-width:100%;}
   color: red;
 }
 
+.board .player-base .header {
+  font-weight: bold;
+}
+
 .board .player-base .name {
   font-style: italic;
-  font-weight: bold;
   font-size: 2em;
   margin-bottom: 10px;
 }
@@ -123,6 +126,10 @@ img {max-width:100%;}
   background: radial-gradient(#ffffff, #ffffff, #aaaaaa);
 }
 
+.unit-picker .unit {
+  border: 1px solid #aaaaaa;
+}
+
 .unit-picker p {
   font-size: 1.2em;
   font-weight: bold;
@@ -136,6 +143,10 @@ img {max-width:100%;}
 .unit-picker.not-shown {
   border: 3px solid rgba(0,0,0,0.0);
   background: none;
+}
+
+.unit-picker.not-shown .unit {
+  border: 1px solid rgba(0,0,0,0.0);
 }
 
 .unit-picker.not-shown p {

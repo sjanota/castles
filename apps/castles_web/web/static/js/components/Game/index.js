@@ -9,102 +9,100 @@ const player1 = {
   name: 'Karo',
   defence:["archer", "axeman", "knight", "archer", "viking"],
   offence: initArmy,
-  color: 'red'
+  color: [255,128,0]
 };
 const player2 = {
   name: 'CJ',
   defence: Array(5).fill("unknown"),
   offence: initArmy,
-  color: 'blue'
+  color: [0,128,128]
 };
 
-const colors = {
-  red: 'rgba(255,0,0,0.3)',
-  blue: 'rgba(0,0,255,0.3)',
+function gradient(color, side) {
+  const rgb = `rgba(${color.join(',')},`;
+  const parts = [
+    '#ffffff',
+    '#ffffff',
+    `${rgb}0.6)`,
+    `${rgb}1.0)`,
+    `${rgb}1.0)`
+  ];
+  const angle = side === "left" ? '45deg' : '-45deg';
+  return `linear-gradient(${angle},${parts.join(',')})`;
 }
 
 const allUnits = ["archer", "axeman", "knight", "ninja", "shieldbearer", "swordsman", "viking", "empty"];
 
-class GameStatus extends React.Component {
-  render() {
-    return (
-      <div className="status">
-        <p>{this.props.activePlayer.name}'s turn</p>
-      </div>
-    );
-  }
+function GameStatus(props) {
+  return (
+    <div className="status">
+      <p>{props.activePlayer.name}'s turn</p>
+    </div>
+  );
 }
 
-class Controls extends React.Component {
-  render() {
-    return (
-      <div className="controls">
-        <button
-          onClick={this.props.onAttack}
-          disabled={!this.props.isAttackPossible}
-        >Attack!</button>
-      </div>
-    );
-  };
+function Controls(props) {
+  return (
+    <div className="controls">
+      <button
+        onClick={props.onAttack}
+        disabled={!props.isAttackPossible}
+      >Attack!</button>
+    </div>
+  );
 }
 
-class Unit extends React.Component {
-  render() {
-    const capitalizedUnit = capitalize(this.props.unit);
-    const unitClasses = classNames('unit', {
-      'no-mirror': this.props.unit === "unknown"
-    });
-    return (
-      <div className={unitClasses}>
-        <img
-          onClick={this.props.onClick}
-          width="50"
-          height="50"
-          src={"images/" + this.props.unit + ".png"}
-          alt={capitalizedUnit}
-          title={capitalizedUnit}
+function Unit(props) {
+  const capitalizedUnit = capitalize(props.unit);
+  const unitClasses = classNames('unit', {
+    'no-mirror': props.unit === "unknown"
+  });
+  return (
+    <div className={unitClasses}>
+      <img
+        onClick={props.onClick}
+        width="50"
+        height="50"
+        src={"images/" + props.unit + ".png"}
+        alt={capitalizedUnit}
+        title={capitalizedUnit}
+      />
+    </div>
+  );
+}
+
+function Army(props) {
+  const armyClasses = classNames('army', 'my-column', {
+    'not-shown': !props.isShown,
+    editable: props.isEditable
+  });
+  return (
+    <div className={armyClasses}>
+      {props.units.map((unit, i) =>
+        <Unit key={i}
+          unit={unit}
+          onClick={() => props.onUnitClick(unit, i)}
         />
-      </div>
-    )
-  }
-}
+      )}
+    </div>
+  );
+};
 
-class Army extends React.Component {
-  render() {
-    const armyClasses = classNames('army', 'my-column', {
-      'not-shown': !this.props.isShown,
-      editable: this.props.isEditable
-    });
-    return (
-      <div className={armyClasses}>
-        {this.props.units.map((unit, i) =>
-          <Unit key={i}
-            unit={unit}
-            onClick={() => this.props.onUnitClick(unit, i)}
-          />
-        )}
-      </div>
-    );
-  }
-}
-
-class UnitPicker extends React.Component {
-  render() {
-    const classes = classNames('unit-picker', {
-      'not-shown': !this.props.isShown
-    });
-    return (
-      <div className={classes}>
-        <p>Choose unit</p>
-        <Army
-          units={allUnits}
-          isShown={this.props.isShown}
-          isEditable={false}
-          onUnitClick={this.props.onUnitClick}
-        />
-      </div>
-    );
-  }
+function UnitPicker(props) {
+  const classes = classNames('unit-picker', {
+    'not-shown': !props.isShown
+  });
+  return (
+    <div className={classes}>
+      <p>Choose unit</p>
+      <Army
+        units={allUnits}
+        isShown={props.isShown}
+        isEditable={false}
+        onUnitClick={props.onUnitClick}
+      />
+    </div>
+  );
 }
 
 function PlayerName(props) {
@@ -160,9 +158,10 @@ function BaseMain(props) {
 
 function Base(props) {
   const baseClasses = classNames('player-base', props.side)
+  console.log(gradient(props.player.color, props.side))
   return (
     <div className={baseClasses} style={{
-      backgroundColor: colors[props.player.color]
+      background: gradient(props.player.color, props.side)
     }}>
       <BaseHeader
         player={props.player}
@@ -245,20 +244,16 @@ export class Game extends React.Component {
   };
 
   onUnitSelected(unit, i) {
-    const player = Object.assign({}, this.activePlayer());
-    const offence = player.offence.slice();
-    offence[this.state.selectedSlot] = unit;
-    player.offence = offence;
-    this.setActivePlayer(player)
-    this.setState({selectedSlot: null})
-  };
-
-  setActivePlayer(player) {
-    if (this.state.myTurn) {
-      this.setState({myPlayer: player})
-    } else {
-      this.setState({opponentPlayer: player})
-    }
+    this.setState((state) => {
+      const player = Object.assign({}, state.myPlayer);
+      const offence = player.offence.slice();
+      offence[state.selectedSlot] = unit;
+      player.offence = offence;
+      return {
+        selectedSlot: null,
+        myPlayer: player
+      }
+    });
   };
 
   isAttackPossible() {
