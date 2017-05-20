@@ -116,40 +116,67 @@ function PlayerName(props) {
   )
 }
 
-class Base extends React.Component {
-  render() {
-    const baseClasses = classNames('player-base', this.props.side)
-    return (
-      <div className={baseClasses} style={{
-        backgroundColor: colors[this.props.player.color]
-      }}>
-        <div className="header">
-          <PlayerName
-            player={this.props.player}
-            title={this.props.title}
-          />
-          <div className="my-container">
-            <span>Defence</span><span>Attack</span>
-          </div>
-        </div>
-        <div className="my-container main">
-          <Army
-            units={this.props.player.defence}
-            isShown={true}
-            isEditable={this.props.isDefenceEditable}
-            onUnitClick={() => {}}
-          />
-          <div><img src="images/castle-vertical.png" className="castle"/></div>
-          <Army
-            units={this.props.player.offence}
-            isShown={this.props.isOffenceShown}
-            isEditable={this.props.isOffenceEditable}
-            onUnitClick={this.props.onUnitClick}
-          />
-        </div>
+function BaseHeader(props) {
+  return (
+    <div className="header">
+      <PlayerName
+        player={props.player}
+        title={props.title}
+      />
+      <div className="my-container">
+        <span>Defence</span><span>Attack</span>
       </div>
-    );
-  }
+    </div>
+  );
+}
+
+function BaseCastle(props) {
+  return (
+    <div>
+      <img src="images/castle-vertical.png" className="castle"/>
+    </div>
+  );
+}
+
+function BaseMain(props) {
+  return (
+    <div className="my-container main">
+      <Army
+        units={props.player.defence}
+        isShown={true}
+        isEditable={props.isDefenceEditable}
+        onUnitClick={() => {}}
+      />
+      <BaseCastle/>
+      <Army
+        units={props.player.offence}
+        isShown={props.isOffenceShown}
+        isEditable={props.isOffenceEditable}
+        onUnitClick={props.onUnitClick}
+      />
+    </div>
+  );
+}
+
+function Base(props) {
+  const baseClasses = classNames('player-base', props.side)
+  return (
+    <div className={baseClasses} style={{
+      backgroundColor: colors[props.player.color]
+    }}>
+      <BaseHeader
+        player={props.player}
+        title={props.title}
+      />
+      <BaseMain
+        player={props.player}
+        isDefenceEditable={props.isDefenceEditable}
+        isOffenceEditable={props.isOffenceEditable}
+        isOffenceShown={props.isOffenceShown}
+        onUnitClick={props.onUnitClick}
+      />
+    </div>
+  );
 }
 
 export class Game extends React.Component {
