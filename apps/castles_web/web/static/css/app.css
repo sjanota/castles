@@ -75,12 +75,16 @@ img {max-width:100%;}
 .my-column {
   display: flex;
   flex-flow: column;
-  justify-content: space-between;
+  justify-content: space-around;
 }
 
 .board .castle {
   max-width: 100px;
   margin: 0px 10px;
+}
+
+.player-base .army.editable .unit {
+  background-color: #eeeeee;
 }
 
 .game .status {
@@ -93,18 +97,20 @@ img {max-width:100%;}
   font-style: italic;
   font-weight: bold;
   font-size: 2em;
+  margin-bottom: 10px;
+}
+
+.board .player-base .name p {
+  margin-bottom: 0px;
 }
 
 .battle-ground {
   align-content: flex-start;
 }
 
-.board .player-base > div {
+.board .player-base .main {
   display: flex;
-}
-
-.army .unit {
-  background-color: #eeeeee;
+  justify-content: center;
 }
 
 .army.not-shown .unit {
@@ -151,9 +157,40 @@ div.right .no-mirror img {
 }
 
 .unit-picker.not-shown {
-    border: 0px;
+    border: 3px solid rgba(0,0,0,0.0);
 }
 
 .unit-picker.not-shown p {
   visibility: hidden;
+}
+
+.game .controls {
+  display: flex;
+  justify-content: center;
+}
+
+button {
+  border: 1px solid #0066cc;
+  background-color: #0099cc;
+  color: #ffffff;
+  padding: 5px 10px;
+}
+
+button:hover {
+  border: 1px solid #0099cc;
+  background-color: #00aacc;
+  color: #ffffff;
+  padding: 5px 10px;
+}
+
+button:disabled,
+button[disabled]{
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
+}
+
+.game .player-base {
+  padding: 10px 10px;
+  max-height: 100%;
 }
