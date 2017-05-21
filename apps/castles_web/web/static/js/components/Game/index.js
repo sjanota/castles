@@ -2,6 +2,7 @@ import React from 'react'
 import { Debug } from '../Common'
 import { capitalize } from '../../util'
 import classNames from 'classnames'
+import { startGame } from './controller'
 
 const initArmy = Array(5).fill(makeUnit("empty"));
 function makeUnit(type, alive) {
@@ -10,13 +11,7 @@ function makeUnit(type, alive) {
 }
 const player1 = {
   name: 'Karo',
-  defence:[
-    makeUnit("swordsman"),
-    makeUnit("axeman"),
-    makeUnit("knight", false),
-    makeUnit("archer", false),
-    makeUnit("viking")
-  ],
+  defence: initArmy,
   offence: initArmy,
   color: [178,118,65]
 };
@@ -54,22 +49,12 @@ function GameStatus(props) {
   );
 }
 
-function Controls(props) {
-  return (
-    <div className="controls">
-      <button
-        onClick={props.onAttack}
-        disabled={!props.isAttackPossible}
-      >Attack!</button>
-    </div>
-  );
-}
-
 function Unit(props) {
   const capitalizedUnit = capitalize(props.unit.type);
   const unitClasses = classNames('unit', {
     'no-mirror': props.unit.type === "unknown",
-    dead: !props.unit.alive
+    dead: !props.unit.alive,
+    alive: props.unit.alive
   });
   return (
     <div className={unitClasses}>
@@ -152,24 +137,41 @@ function BaseCastle(props) {
   );
 }
 
-function BaseMain(props) {
-  return (
-    <div className="my-container main">
-      <Army
-        units={props.player.defence}
-        isShown={true}
-        isEditable={props.isDefenceEditable}
-        onUnitClick={() => {}}
-      />
-      <BaseCastle/>
-      <Army
-        units={props.player.offence}
-        isShown={props.isOffenceShown}
-        isEditable={props.isOffenceEditable}
-        onUnitClick={props.onUnitClick}
-      />
-    </div>
-  );
+class BaseMain extends React.Component {
+  constructor() {
+    super();
+    this.onUnitClick = this.onUnitClick.bind(this);
+  }
+
+  render() {
+    return (
+      <div className="my-container main">
+        <Army
+          units={this.props.player.defence}
+          isShown={true}
+          isEditable={this.props.isDefenceEditable}
+          onUnitClick={(unit, i) =>
+            this.onUnitClick('defence', this.props.isDefenceEditable, unit, i)
+          }
+        />
+        <BaseCastle/>
+        <Army
+          units={this.props.player.offence}
+          isShown={this.props.isOffenceShown}
+          isEditable={this.props.isOffenceEditable}
+          onUnitClick={(unit, i) =>
+            this.onUnitClick('offence', this.props.isOffenceEditable, unit, i)
+          }
+        />
+      </div>
+    );
+  }
+
+  onUnitClick(army, isEditable, unit, i ) {
+    if (isEditable) {
+      this.props.onUnitClick(army, unit, i)
+    }
+  }
 }
 
 function Base(props) {
@@ -199,13 +201,14 @@ export class Game extends React.Component {
     this.switchActivePlayer = this.switchActivePlayer.bind(this);
     this.onSlotSelected = this.onSlotSelected.bind(this);
     this.onUnitSelected = this.onUnitSelected.bind(this);
-    this.onAttack = this.onAttack.bind(this);
+    this.nextController = this.nextController.bind(this);
     this.state = {
       myPlayer: player1,
       opponentPlayer: player2,
       myTurn: true,
       unitPickerActive: false,
-      selectedSlot: null
+      selectedSlot: null,
+      controller: startGame(this)
     };
   };
 
@@ -214,18 +217,15 @@ export class Game extends React.Component {
       <div className="game">
         <h3>Game</h3>
         <GameStatus activePlayer={this.activePlayer()}/>
-        <Controls
-          isAttackPossible={this.isAttackPossible()}
-          onAttack={this.onAttack}
-        />
+        {this.state.controller.renderControlls(this.state)}
         <div className="board my-container">
           <Base
             player={this.state.myPlayer}
             title="You"
             side="left"
-            isDefenceEditable={false}
-            isOffenceEditable={this.state.myTurn}
-            isOffenceShown={this.state.myTurn}
+            isDefenceEditable={this.state.controller.isDefenceEditable()}
+            isOffenceEditable={this.state.controller.isOffenceEditable()}
+            isOffenceShown={this.state.controller.isOffenceShown()}
             onUnitClick={this.onSlotSelected}
           />
           <UnitPicker
@@ -254,16 +254,17 @@ export class Game extends React.Component {
     this.setState((prev) => prev.myTurn = !prev.myTurn);
   };
 
-  onSlotSelected(unit, i) {
-    this.setState({selectedSlot: i});
+  onSlotSelected(army, unit, i) {
+    this.setState({selectedSlot: {army: army, number: i}});
   };
 
   onUnitSelected(unit, i) {
     this.setState((state) => {
       const player = Object.assign({}, state.myPlayer);
-      const offence = player.offence.slice();
-      offence[state.selectedSlot] = unit;
-      player.offence = offence;
+      const armyName = state.selectedSlot.army
+      const army = player[armyName].slice();
+      army[state.selectedSlot.number] = unit;
+      player[armyName] = army;
       return {
         selectedSlot: null,
         myPlayer: player
@@ -271,11 +272,7 @@ export class Game extends React.Component {
     });
   };
 
-  isAttackPossible() {
-    return this.state.myPlayer.offence.every((it) => it !== "empty")
-  };
-
-  onAttack() {
-
-  };
+  nextController(controller) {
+    this.setState({controller: controller});
+  }
 };

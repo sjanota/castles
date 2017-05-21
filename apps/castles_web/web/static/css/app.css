@@ -83,7 +83,7 @@ img {max-width:100%;}
   margin: 0px 10px;
 }
 
-.player-base .army.editable .unit {
+.player-base .army.editable .unit.alive {
   background-color: #eeeeee;
 }
 
@@ -103,6 +103,7 @@ img {max-width:100%;}
   margin-bottom: 10px;
   padding: 0px 5px;
 }
+
 .board .player-base.left .name {
   background: linear-gradient(90deg, rgba(255,255,255,1.0), rgba(255,255,255,0.0));
 }
