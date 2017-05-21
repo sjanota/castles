@@ -1,7 +1,37 @@
 import React from 'react'
+import {Socket} from "phoenix"
 
-export function startGame(game) {
-  return new InitGame(game)
+export function startGame(game, myPlayer) {
+  const socket =  new Socket("/game", {params: {
+    name: myPlayer.name,
+    color: myPlayer.color
+  }});
+  socket.connect();
+  const channel = socket.channel("game:public", {});
+  channel.on("game:prepare", payload => {
+    console.log("Prepare!", payload.me, payload.opponent)
+    game.setPlayers(payload.me, payload.opponent);
+    game.nextController(new PrepareDefences(game, channel));
+  });
+  channel.on("game:your-turn", payload => {
+    console.log("My turn!", payload.me, payload.opponent)
+    game.setPlayers(payload.me, payload.opponent);
+    game.nextController(new MyTurn(game, channel));
+  });
+  channel.on("game:opponent-turn", payload => {
+    console.log("His turn!", payload.me, payload.opponent)
+    game.setPlayers(payload.me, payload.opponent);
+    game.nextController(new OpponentTurn(game, channel));
+  });
+  channel.join()
+    .receive("ok", resp => {
+      console.log("Successful join", resp)
+    })
+    .receive("error", resp => {
+      console.log("Unable to join", resp);
+      game.nextController(new GameError(game));
+    });
+  return new WaitForPrepare();
 }
 
 function Controls(props) {
@@ -13,75 +43,81 @@ function Controls(props) {
 }
 
 class GameController {
-  isDefenceEditable() {}
-  isOffenceEditable() {}
-  isOffenceShown() {}
-  handleMessage() {}
+  isDefensiveEditable() { return false; }
+  isOffensiveEditable() { return false; }
+  isOffensiveShown() { return false; }
   getStatus() {}
-  renderControlls() {}
+  renderControlls() { return <Controls/>; }
 }
 
-class InitGame extends GameController {
-  constructor(game) {
+class WaitForPrepare extends GameController {
+  getStatus() {
+    return "Waiting for opponent"
+  }
+}
+
+class PrepareDefences extends GameController {
+  constructor(game, channel) {
     super();
     this.onCommit = this.onCommit.bind(this);
     this.renderControlls = this.renderControlls.bind(this);
     this.game = game;
+    this.channel = channel;
   }
 
-  isDefenceEditable() {
-    return true;
-  }
-  isOffenceEditable() {
-    return false;
-  }
-  isOffenceShown() {
-    return false;
-  }
+  isDefensiveEditable() { return true; }
+
   getStatus(state) {
-    return "Choose your defences";
+    return "Choose your defence";
   }
   renderControlls(state) {
     return  (
       <Controls>
         <button
-          onClick={this.onCommit}
+          onClick={() => this.onCommit(state)}
           disabled={!this.isCommitPossible(state)}
-        >Apply defences</button>
+        >Apply defensives</button>
       </Controls>
     );
   }
 
   // PRIVATE
   isCommitPossible(state) {
-    return state.myPlayer.defence.every((it) => it.type !== "empty");
+    return state.myPlayer.defensive.every((it) => it.type !== "empty");
   }
 
-  onCommit() {
-    console.log(this);
-    this.game.nextController(new MyTurn(this.game))
+  onCommit(state) {
+    this.game.nextController(new WaitForStart());
+    this.channel.push("player:prepared", state.myPlayer.defensive);
+  }
+}
+
+class WaitForStart extends GameController {
+  getStatus(state) {
+    return `Waiting for ${state.opponentPlayer.name} to choose defence`;
   }
 }
 
 class MyTurn extends GameController {
-  constructor(game) {
+  constructor(game, channel) {
     super();
     this.onCommit = this.onAttack.bind(this);
     this.renderControlls = this.renderControlls.bind(this);
     this.game = game;
+    this.channel = channel;
   }
 
-  isDefenceEditable() {
+  isDefensiveEditable() {
     return false;
   }
-  isOffenceEditable() {
+  isOffensiveEditable() {
     return true;
   }
-  isOffenceShown() {
+  isOffensiveShown() {
     return true;
   }
   getStatus(state) {
-    return `${state.myPlayer.name}'s turn - choose attack forces`
+    return `Your turn - choose attack forces`
   }
   renderControlls(state) {
     return  (
@@ -97,10 +133,16 @@ class MyTurn extends GameController {
   // PRIVATE
 
   onAttack() {
-    
+
   }
 
   isAttackPossible(state) {
-    return state.myPlayer.offence.every((it) => it.type !== "empty")
+    return state.myPlayer.offensive.every((it) => it.type !== "empty")
+  }
+}
+
+class OpponentTurn extends GameController {
+  getStatus(state) {
+    return `Waiting for ${state.opponentPlayer.name} to attack`
   }
 }

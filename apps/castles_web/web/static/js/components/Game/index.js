@@ -8,22 +8,32 @@ const initArmy = Array(5).fill(makeUnit("empty"));
 function makeUnit(type, alive) {
   alive = alive !== false ? true : false
   return {type: type, alive: alive}
-}
-const player1 = {
-  name: 'Karo',
-  defence: initArmy,
-  offence: initArmy,
-  color: [178,118,65]
 };
-const player2 = {
-  name: 'CJ',
-  defence: Array(5).fill(makeUnit("unknown")),
-  offence: initArmy,
-  color: [0,128,128]
+
+function randomColor() {
+  function number() {
+    return Math.floor(Math.random() * 256)
+  }
+  return `${number()},${number()},${number()}`
+}
+
+const player1 = {
+  name: Math.random().toString(36).substr(2, 10),
+  defensive: initArmy,
+  offensive: initArmy,
+  color: randomColor()
+};
+
+const nullPlayer = {
+  name: '',
+  defensive: initArmy,
+  offensive: initArmy,
+  color: "0,0,0",
+  hidden: true
 };
 
 function gradientColor(color, side) {
-  const rgb = `rgba(${color.join(',')},`;
+  const rgb = `rgba(${color},`;
   const parts = [
     '#ffffff',
     '#ffffff',
@@ -36,7 +46,7 @@ function gradientColor(color, side) {
 }
 
 function plainColor(color, sied) {
-  return `rgb(${color.join(',')})`
+  return `rgb(${color})`
 }
 
 const allUnits = ["archer", "axeman", "knight", "ninja", "shieldbearer", "swordsman", "viking", "empty"].map(makeUnit);
@@ -52,7 +62,7 @@ function GameStatus(props) {
 function Unit(props) {
   const capitalizedUnit = capitalize(props.unit.type);
   const unitClasses = classNames('unit', {
-    'no-mirror': props.unit.type === "unknown",
+    'mirror': props.unit.type !== "unknown",
     dead: !props.unit.alive,
     alive: props.unit.alive
   });
@@ -89,7 +99,7 @@ function Army(props) {
 };
 
 function UnitPicker(props) {
-  const classes = classNames('unit-picker', {
+  const classes = classNames('unit-picker', 'hiddable', {
     'not-shown': !props.isShown
   });
   return (
@@ -123,7 +133,7 @@ function BaseHeader(props) {
         title={props.title}
       />
       <div className="my-container">
-        <span>Defence</span><span>Attack</span>
+        <span>Defensive</span><span>Attack</span>
       </div>
     </div>
   );
@@ -132,8 +142,18 @@ function BaseHeader(props) {
 function BaseCastle(props) {
   return (
     <div>
-      <img src="images/castle-vertical.png" className="castle"/>
+      <img src="images/castle-vertical.png" className="castle mirror"/>
     </div>
+  );
+}
+
+function Waiting(props) {
+  const classes = classNames('center', props.classes)
+  return (
+    <img
+      src="images/ajax-loader.gif"
+      className={classes}
+    />
   );
 }
 
@@ -147,20 +167,20 @@ class BaseMain extends React.Component {
     return (
       <div className="my-container main">
         <Army
-          units={this.props.player.defence}
+          units={this.props.player.defensive}
           isShown={true}
-          isEditable={this.props.isDefenceEditable}
+          isEditable={this.props.isDefensiveEditable}
           onUnitClick={(unit, i) =>
-            this.onUnitClick('defence', this.props.isDefenceEditable, unit, i)
+            this.onUnitClick('defensive', this.props.isDefensiveEditable, unit, i)
           }
         />
         <BaseCastle/>
         <Army
-          units={this.props.player.offence}
-          isShown={this.props.isOffenceShown}
-          isEditable={this.props.isOffenceEditable}
+          units={this.props.player.offensive}
+          isShown={this.props.isOffensiveShown}
+          isEditable={this.props.isOffensiveEditable}
           onUnitClick={(unit, i) =>
-            this.onUnitClick('offence', this.props.isOffenceEditable, unit, i)
+            this.onUnitClick('offensive', this.props.isOffensiveEditable, unit, i)
           }
         />
       </div>
@@ -175,22 +195,27 @@ class BaseMain extends React.Component {
 }
 
 function Base(props) {
-  const baseClasses = classNames('player-base', props.side)
+  const baseClasses = classNames('player-base', 'hiddable', 'centerable', props.side, {
+    'not-shown': props.player.hidden
+  });
+  let styles = {};
+  if (!props.player.hidden) {
+    styles.background = gradientColor(props.player.color, props.side);
+  }
   return (
-    <div className={baseClasses} style={{
-      background: gradientColor(props.player.color, props.side)
-    }}>
+    <div className={baseClasses} style={styles}>
       <BaseHeader
         player={props.player}
         title={props.title}
       />
       <BaseMain
         player={props.player}
-        isDefenceEditable={props.isDefenceEditable}
-        isOffenceEditable={props.isOffenceEditable}
-        isOffenceShown={props.isOffenceShown}
+        isDefensiveEditable={props.isDefensiveEditable}
+        isOffensiveEditable={props.isOffensiveEditable}
+        isOffensiveShown={props.isOffensiveShown}
         onUnitClick={props.onUnitClick}
       />
+      {props.player.hidden ? <Waiting classes="shown"/> : ""}
     </div>
   );
 }
@@ -204,11 +229,11 @@ export class Game extends React.Component {
     this.nextController = this.nextController.bind(this);
     this.state = {
       myPlayer: player1,
-      opponentPlayer: player2,
+      opponentPlayer: nullPlayer,
       myTurn: true,
       unitPickerActive: false,
       selectedSlot: null,
-      controller: startGame(this)
+      controller: startGame(this, player1)
     };
   };
 
@@ -225,9 +250,9 @@ export class Game extends React.Component {
             player={this.state.myPlayer}
             title="You"
             side="left"
-            isDefenceEditable={this.state.controller.isDefenceEditable()}
-            isOffenceEditable={this.state.controller.isOffenceEditable()}
-            isOffenceShown={this.state.controller.isOffenceShown()}
+            isDefensiveEditable={this.state.controller.isDefensiveEditable()}
+            isOffensiveEditable={this.state.controller.isOffensiveEditable()}
+            isOffensiveShown={this.state.controller.isOffensiveShown()}
             onUnitClick={this.onSlotSelected}
           />
           <UnitPicker
@@ -238,18 +263,14 @@ export class Game extends React.Component {
             player={this.state.opponentPlayer}
             title="Opponent"
             side="right"
-            isDefenceEditable={false}
-            isOffenceEditable={false}
-            isOffenceShown={true}
+            isDefensiveEditable={false}
+            isOffensiveEditable={false}
+            isOffensiveShown={true}
             onUnitClick={() => {}}
           />
         </div>
       </div>
     );
-  };
-
-  activePlayer() {
-    return this.state.myTurn ? this.state.myPlayer : this.state.opponentPlayer;
   };
 
   switchActivePlayer() {
@@ -276,5 +297,16 @@ export class Game extends React.Component {
 
   nextController(controller) {
     this.setState({controller: controller});
+  }
+
+  setPlayers(myPlayer, opponentPlayer) {
+    let toSet = {};
+    if (myPlayer) {
+      toSet.myPlayer = myPlayer;
+    }
+    if (opponentPlayer) {
+      toSet.opponentPlayer = opponentPlayer;
+    }
+    this.setState(toSet);
   }
 };

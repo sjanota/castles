@@ -1,8 +1,8 @@
-defmodule CastlesWeb.UserSocket do
+defmodule CastlesWeb.GameSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "room:*", CastlesWeb.RoomChannel
+  channel "game:*", CastlesWeb.GameChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
@@ -19,8 +19,11 @@ defmodule CastlesWeb.UserSocket do
   #
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
-  def connect(_params, socket) do
-    {:ok, socket}
+  def connect(%{"name" => name, "color" => color}, socket) do
+    {:ok, socket
+      |> assign(:name, name)
+      |> assign(:color, color)
+    }
   end
 
   # Socket id's are topics that allow you to identify all sockets for a given user:

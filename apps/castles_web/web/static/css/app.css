@@ -6,6 +6,10 @@ img {max-width:100%;}
   color: red;
 }
 
+.game .controls {
+  min-height: 32px;
+}
+
 .error > .field > .name {
   font-weight: bold;
 }
@@ -125,10 +129,6 @@ img {max-width:100%;}
   justify-content: center;
 }
 
-.army.not-shown .unit {
-  background-color: inherit;
-}
-
 .army .unit {
   position: relative;
   overflow: hidden;
@@ -190,15 +190,10 @@ img {max-width:100%;}
 
 .unit-picker.not-shown {
   border: 3px solid rgba(0,0,0,0.0);
-  background: none;
 }
 
 .unit-picker.not-shown .unit {
   border: 1px solid rgba(0,0,0,0.0);
-}
-
-.unit-picker.not-shown p {
-  visibility: hidden;
 }
 
 .game .controls {
@@ -217,16 +212,8 @@ div.left .align {
   text-align: left;
 }
 
-div.right img {
+div.right.mirror img {
   transform: scaleX(-1);
-}
-
-div.right .no-mirror img {
-  transform: none;
-}
-
-.army.not-shown img {
-  visibility: hidden;
 }
 
 .game .controls {
@@ -258,4 +245,29 @@ button[disabled]{
 .game .player-base {
   padding: 10px 10px;
   max-height: 100%;
+}
+
+.hiddable.not-shown {
+  background: none;
+}
+
+.hiddable.not-shown * {
+  background: none;
+  visibility: hidden;
+}
+
+.hiddable .shown {
+  visibility: visible;
+}
+
+.centerable {
+  position: relative;
+}
+
+.centerable .center {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
