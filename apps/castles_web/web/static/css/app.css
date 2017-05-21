@@ -120,6 +120,45 @@ img {max-width:100%;}
   background-color: inherit;
 }
 
+.army .unit {
+  position: relative;
+  overflow: hidden;
+}
+
+.army .unit.dead {
+  background: rgba(255, 0, 0, 0.5);
+}
+
+.army .unit .killed-overlay {
+  position: absolute;
+  top: 0px;
+  width: 50px;
+  height: 50px;
+  margin: 0px;
+  line-height: 50px;
+}
+
+.killed-overlay:before, .killed-overlay:after {
+  position: absolute;
+  left: 23px;
+  top: -11px;
+  content: ' ';
+  height: 72px;
+  width: 5px;
+  background-color: #ff0000;
+}
+.killed-overlay:before {
+  transform: rotate(45deg);
+}
+.killed-overlay:after {
+  transform: rotate(-45deg);
+}
+
+
+.army .unit img {
+  position: relative;
+}
+
 .unit-picker {
   padding: 5px;
   border: 3px solid gray;

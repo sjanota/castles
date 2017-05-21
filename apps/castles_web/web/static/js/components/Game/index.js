@@ -3,17 +3,26 @@ import { Debug } from '../Common'
 import { capitalize } from '../../util'
 import classNames from 'classnames'
 
-const initArmy = Array(5).fill("empty");
-
+const initArmy = Array(5).fill(makeUnit("empty"));
+function makeUnit(type, alive) {
+  alive = alive !== false ? true : false
+  return {type: type, alive: alive}
+}
 const player1 = {
   name: 'Karo',
-  defence:["archer", "axeman", "knight", "archer", "viking"],
+  defence:[
+    makeUnit("swordsman"),
+    makeUnit("axeman"),
+    makeUnit("knight", false),
+    makeUnit("archer", false),
+    makeUnit("viking")
+  ],
   offence: initArmy,
   color: [255,128,0]
 };
 const player2 = {
   name: 'CJ',
-  defence: Array(5).fill("unknown"),
+  defence: Array(5).fill(makeUnit("unknown")),
   offence: initArmy,
   color: [0,128,128]
 };
@@ -31,7 +40,7 @@ function gradient(color, side) {
   return `linear-gradient(${angle},${parts.join(',')})`;
 }
 
-const allUnits = ["archer", "axeman", "knight", "ninja", "shieldbearer", "swordsman", "viking", "empty"];
+const allUnits = ["archer", "axeman", "knight", "ninja", "shieldbearer", "swordsman", "viking", "empty"].map(makeUnit);
 
 function GameStatus(props) {
   return (
@@ -53,9 +62,10 @@ function Controls(props) {
 }
 
 function Unit(props) {
-  const capitalizedUnit = capitalize(props.unit);
+  const capitalizedUnit = capitalize(props.unit.type);
   const unitClasses = classNames('unit', {
-    'no-mirror': props.unit === "unknown"
+    'no-mirror': props.unit.type === "unknown",
+    dead: !props.unit.alive
   });
   return (
     <div className={unitClasses}>
@@ -63,10 +73,11 @@ function Unit(props) {
         onClick={props.onClick}
         width="50"
         height="50"
-        src={"images/" + props.unit + ".png"}
+        src={"images/" + props.unit.type + ".png"}
         alt={capitalizedUnit}
         title={capitalizedUnit}
       />
+      {!props.unit.alive ? <p className="killed-overlay"></p> : ""}
     </div>
   );
 }
