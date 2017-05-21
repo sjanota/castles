@@ -44,7 +44,7 @@ const allUnits = ["archer", "axeman", "knight", "ninja", "shieldbearer", "swords
 function GameStatus(props) {
   return (
     <div className="status">
-      <p>{props.activePlayer.name}'s turn</p>
+      <p>{props.message}</p>
     </div>
   );
 }
@@ -216,7 +216,9 @@ export class Game extends React.Component {
     return (
       <div className="game">
         <h3>Game</h3>
-        <GameStatus activePlayer={this.activePlayer()}/>
+        <GameStatus
+          message={this.state.controller.getStatus(this.state)}
+        />
         {this.state.controller.renderControlls(this.state)}
         <div className="board my-container">
           <Base

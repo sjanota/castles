@@ -17,6 +17,7 @@ class GameController {
   isOffenceEditable() {}
   isOffenceShown() {}
   handleMessage() {}
+  getStatus() {}
   renderControlls() {}
 }
 
@@ -36,6 +37,9 @@ class InitGame extends GameController {
   }
   isOffenceShown() {
     return false;
+  }
+  getStatus(state) {
+    return "Choose your defences";
   }
   renderControlls(state) {
     return  (
@@ -76,7 +80,9 @@ class MyTurn extends GameController {
   isOffenceShown() {
     return true;
   }
-
+  getStatus(state) {
+    return `${state.myPlayer.name}'s turn - choose attack forces`
+  }
   renderControlls(state) {
     return  (
       <Controls>
@@ -91,7 +97,7 @@ class MyTurn extends GameController {
   // PRIVATE
 
   onAttack() {
-
+    
   }
 
   isAttackPossible(state) {
