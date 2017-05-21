@@ -126,7 +126,7 @@ img {max-width:100%;}
 }
 
 .army .unit.dead {
-  background: rgba(255, 0, 0, 0.5);
+  background: radial-gradient(rgba(255, 0, 0, 0.5), rgba(0,0,0,0.0));
 }
 
 .army .unit .killed-overlay {
