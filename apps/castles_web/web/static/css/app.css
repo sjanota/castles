@@ -101,6 +101,14 @@ img {max-width:100%;}
   font-style: italic;
   font-size: 2em;
   margin-bottom: 10px;
+  padding: 0px 5px;
+}
+.board .player-base.left .name {
+  background: linear-gradient(90deg, rgba(255,255,255,1.0), rgba(255,255,255,0.0));
+}
+
+.board .player-base.right .name {
+  background: linear-gradient(-90deg, rgba(255,255,255,1.0), rgba(255,255,255,0.0));
 }
 
 .board .player-base .name p {
@@ -126,7 +134,7 @@ img {max-width:100%;}
 }
 
 .army .unit.dead {
-  background: radial-gradient(rgba(255, 0, 0, 0.5), rgba(0,0,0,0.0));
+  background: radial-gradient(rgba(255, 0, 0, 0.5), rgba(255, 0, 0, 0.5), rgba(255, 0, 0, 0.5), rgba(255, 0, 0, 0.5), rgba(0,0,0,0.0), rgba(0,0,0,0.0), rgba(0,0,0,0.0));
 }
 
 .army .unit .killed-overlay {

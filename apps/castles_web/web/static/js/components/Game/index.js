@@ -18,7 +18,7 @@ const player1 = {
     makeUnit("viking")
   ],
   offence: initArmy,
-  color: [255,128,0]
+  color: [178,118,65]
 };
 const player2 = {
   name: 'CJ',
@@ -27,7 +27,7 @@ const player2 = {
   color: [0,128,128]
 };
 
-function gradient(color, side) {
+function gradientColor(color, side) {
   const rgb = `rgba(${color.join(',')},`;
   const parts = [
     '#ffffff',
@@ -38,6 +38,10 @@ function gradient(color, side) {
   ];
   const angle = side === "left" ? '45deg' : '-45deg';
   return `linear-gradient(${angle},${parts.join(',')})`;
+}
+
+function plainColor(color, sied) {
+  return `rgb(${color.join(',')})`
 }
 
 const allUnits = ["archer", "axeman", "knight", "ninja", "shieldbearer", "swordsman", "viking", "empty"].map(makeUnit);
@@ -117,10 +121,11 @@ function UnitPicker(props) {
 }
 
 function PlayerName(props) {
+  const styles = {color: plainColor(props.player.color)}
   return (
     <div className="name">
-      <p className="align">{props.player.name}</p>
-      <p className="align">({props.title})</p>
+      <p className="align" style={styles}>{props.player.name}</p>
+      <p className="align" style={styles}>({props.title})</p>
     </div>
   )
 }
@@ -169,10 +174,9 @@ function BaseMain(props) {
 
 function Base(props) {
   const baseClasses = classNames('player-base', props.side)
-  console.log(gradient(props.player.color, props.side))
   return (
     <div className={baseClasses} style={{
-      background: gradient(props.player.color, props.side)
+      background: gradientColor(props.player.color, props.side)
     }}>
       <BaseHeader
         player={props.player}
