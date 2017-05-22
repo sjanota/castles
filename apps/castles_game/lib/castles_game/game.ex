@@ -147,7 +147,6 @@ defmodule CastlesGame.Game do
   def handle_call({:player_attack, attack}, {pid, _tag}, %{players: [%{pid: pid} | _]} = state) do
     {:reply, :ok, state
       |> resolve_attack(Player.parse_army(attack))
-      # |> clear_defender_offensive
       |> next_turn_or_game_end
     }
   end
@@ -232,7 +231,7 @@ defmodule CastlesGame.Game do
       # defender is killed
       defender_force == 1 -> {true, false}
       # attacker is killed
-      # defender_force <= 3 -> {false, true}
+      defender_force <= 3 -> {false, true}
       # paar
       true -> {true, true}
     end

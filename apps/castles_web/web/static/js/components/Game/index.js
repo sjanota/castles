@@ -97,16 +97,22 @@ function Unit(props) {
   return (
     <div className={unitClasses}>
       <img
-        onClick={props.onClick}
         width="50"
         height="50"
         src={"images/" + props.unit.type + ".png"}
         alt={capitalizedUnit}
         title={`${capitalizedUnit}\nKills: ${iKill(props.unit.type)}\nKilled by: ${killsMe(props.unit.type)}`}
+        onClick={props.onClick}
         onMouseEnter={() => props.onHover(props.unit.type)}
         onMouseLeave={() => props.onHover(null)}
       />
-      {!props.unit.alive ? <p className="killed-overlay"></p> : ""}
+      {!props.unit.alive ? <p
+        className="killed-overlay"
+        title={`${capitalizedUnit}\nKills: ${iKill(props.unit.type)}\nKilled by: ${killsMe(props.unit.type)}`}
+        onClick={props.onClick}
+        onMouseEnter={() => props.onHover(props.unit.type)}
+        onMouseLeave={() => props.onHover(null)}
+      /> : ""}
     </div>
   );
 }
@@ -383,7 +389,6 @@ export class Game extends React.Component {
   }
 
   isUnitEditable(i) {
-    console.log(i, this.state.opponentPlayer.defensive[i].alive)
     return this.state.opponentPlayer.defensive[i].alive
   }
 };

@@ -18,13 +18,24 @@ const nullPlayer = {
 export const allUnitTypes = ["archer", "axeman", "knight", "ninja", "shieldbearer", "swordsman", "viking"]
 export const allUnits = ["archer", "axeman", "knight", "ninja", "shieldbearer", "swordsman", "viking"].map(makeUnit);
 
+function randomUnit() {
+  const i = Math.floor(Math.random() * allUnitTypes.length);
+  return allUnits[i];
+}
+
 function randomUnits() {
-  function randomUnit() {
-    const i = Math.floor(Math.random() * allUnitTypes.length);
-    return allUnits[i];
+  return Array(5).fill(null).map(randomUnit);
+}
+
+function findAttackingUnits(opponentDefences) {
+  console.log(opponentDefences.filter(u => u.alive))
+  return opponentDefences.filter(u => u.alive).map(u => opponentDefences.indexOf(u))
+}
+
+function fillRandomly(units, indexes) {
+  for (let i of indexes) {
+    units[i] = randomUnit()
   }
-  const r = Array(5).fill(null).map(randomUnit);
-  return r
 }
 
 export function startGame(game, playerData) {
@@ -141,8 +152,8 @@ class PrepareDefences extends GameController {
 
   onRandomDefensive(state) {
     const myPlayer = Object.assign({}, state.myPlayer);
-    myPlayer.defensive = randomUnits();
-    this.game.setPlayers(myPlayer)
+    fillRandomly(myPlayer.defensive, [...Array(5).keys()]);
+    this.game.setPlayers(myPlayer);
   }
 }
 
@@ -199,8 +210,9 @@ class MyTurn extends GameController {
 
   onRandomOffensive(state) {
     const myPlayer = Object.assign({}, state.myPlayer);
-    myPlayer.offensive = randomUnits();
-    this.game.setPlayers(myPlayer)
+    const indexes = findAttackingUnits(state.opponentPlayer.defensive);
+    fillRandomly(myPlayer.offensive, indexes);
+    this.game.setPlayers(myPlayer);
   }
 }
 

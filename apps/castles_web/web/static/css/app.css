@@ -87,7 +87,7 @@ img {max-width:100%;}
   margin: 0px 10px;
 }
 
-.player-base .army .unit.alive.editable {
+.player-base .army .unit.editable {
   background-color: #eeeeee;
 }
 
@@ -251,6 +251,9 @@ div.right img.mirror {
   justify-content: center;
 }
 
+.game .controls button {
+  margin: 0px 5px;
+}
 button {
   border: 1px solid #0066cc;
   background-color: #0099cc;
