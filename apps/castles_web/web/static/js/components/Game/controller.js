@@ -18,6 +18,15 @@ const nullPlayer = {
 export const allUnitTypes = ["archer", "axeman", "knight", "ninja", "shieldbearer", "swordsman", "viking"]
 export const allUnits = ["archer", "axeman", "knight", "ninja", "shieldbearer", "swordsman", "viking"].map(makeUnit);
 
+function randomUnits() {
+  function randomUnit() {
+    const i = Math.floor(Math.random() * allUnitTypes.length);
+    return allUnits[i];
+  }
+  const r = Array(5).fill(null).map(randomUnit);
+  return r
+}
+
 export function startGame(game, playerData) {
   const myPlayer = Object.assign({
     offensive: initArmy.slice(),
@@ -31,7 +40,7 @@ export function startGame(game, playerData) {
   const channel = socket.channel("game:public", {});
   channel.on("game:prepare", payload => {
     console.log("Prepare!", payload.me, payload.opponent)
-    payload.me.defensive = Array(5).fill({type: "archer", alive: true})
+    // payload.me.defensive = Array(5).fill({type: "archer", alive: true})
     game.setPlayers(payload.me, payload.opponent);
     game.nextController(new PrepareDefences(game, channel));
   });
@@ -95,6 +104,7 @@ class PrepareDefences extends GameController {
   constructor(game, channel) {
     super();
     this.onCommit = this.onCommit.bind(this);
+    this.onRandomDefensive = this.onRandomDefensive.bind(this);
     this.renderControlls = this.renderControlls.bind(this);
     this.game = game;
     this.channel = channel;
@@ -112,6 +122,9 @@ class PrepareDefences extends GameController {
           onClick={() => this.onCommit(state)}
           disabled={!this.isCommitPossible(state)}
         >Apply defensive</button>
+        <button
+          onClick={() => this.onRandomDefensive(state)}
+        >Random defensive</button>
       </Controls>
     );
   }
@@ -124,6 +137,12 @@ class PrepareDefences extends GameController {
   onCommit(state) {
     this.game.nextController(new WaitForStart());
     this.channel.push("player:prepared", state.myPlayer.defensive);
+  }
+
+  onRandomDefensive(state) {
+    const myPlayer = Object.assign({}, state.myPlayer);
+    myPlayer.defensive = randomUnits();
+    this.game.setPlayers(myPlayer)
   }
 }
 
@@ -161,18 +180,27 @@ class MyTurn extends GameController {
           onClick={() => this.onAttack(state)}
           disabled={!this.isAttackPossible(state)}
         >Attack!</button>
+        <button
+          onClick={() => this.onRandomOffensive(state)}
+        >Random offensive</button>
       </Controls>
     );
   }
 
   // PRIVATE
 
+  isAttackPossible(state) {
+    return state.myPlayer.offensive.every((it) => it.type !== "empty");
+  }
+
   onAttack(state) {
     this.channel.push("player:attack", state.myPlayer.offensive);
   }
 
-  isAttackPossible(state) {
-    return state.myPlayer.offensive.every((it) => it.type !== "empty");
+  onRandomOffensive(state) {
+    const myPlayer = Object.assign({}, state.myPlayer);
+    myPlayer.offensive = randomUnits();
+    this.game.setPlayers(myPlayer)
   }
 }
 

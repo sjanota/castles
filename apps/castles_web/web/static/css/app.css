@@ -87,7 +87,7 @@ img {max-width:100%;}
   margin: 0px 10px;
 }
 
-.player-base .army.editable .unit.alive {
+.player-base .army .unit.alive.editable {
   background-color: #eeeeee;
 }
 

@@ -12,8 +12,8 @@ function randomColor() {
 }
 
 const player1 = {
-  // name: Math.random().toString(36).substr(2, 10),
-  name: prompt("Your name, My Lord:"),
+  name: Math.random().toString(36).substr(2, 10),
+  // name: prompt("Your name, My Lord:"),
   color: randomColor()
 };
 
@@ -57,7 +57,7 @@ function UnitLegend(props) {
       onMouseLeave={() => props.onHover(null)}
     >
       <th>{props.type.toUpperCase()}</th>
-      <th>{killsMe(props.type).map(u => <span>{u}</span>)}</th>
+      <th>{killsMe(props.type).map(u => <span key={u}>{u}</span>)}</th>
       <th>{iKill(props.type)}</th>
     </tr>
   );
@@ -91,7 +91,8 @@ function Unit(props) {
     'mirror': props.unit.type !== "unknown",
     dead: !props.unit.alive,
     alive: props.unit.alive,
-    selected: props.isSelected
+    selected: props.isSelected,
+    editable: props.isEditable
   });
   return (
     <div className={unitClasses}>
@@ -113,15 +114,15 @@ function Unit(props) {
 function Army(props) {
   const armyClasses = classNames('army', 'my-column', {
     'not-shown': !props.isShown,
-    editable: props.isEditable,
     selected: props.isSelected
   });
   return (
     <div className={armyClasses}>
       {props.units.map((unit, i) =>
         <Unit key={i}
-          isSelected={props.selectedUnit === i}
           unit={unit}
+          isSelected={props.selectedUnit === i}
+          isEditable={props.isEditable && props.isUnitEditable(i)}
           onClick={() => props.onUnitClick(unit, i)}
           onHover={props.onUnitHover}
         />
@@ -195,6 +196,8 @@ class BaseMain extends React.Component {
   constructor() {
     super();
     this.onUnitClick = this.onUnitClick.bind(this);
+    this.onDefensiveUnitClick = this.onDefensiveUnitClick.bind(this);
+    this.onOffensiveUnitClick = this.onOffensiveUnitClick.bind(this);
   }
 
   render() {
@@ -202,29 +205,38 @@ class BaseMain extends React.Component {
       <div className="my-container main">
         <Army
           units={this.props.player.defensive}
+          selectedUnit={this.props.selectedUnit}
           isShown={true}
           isEditable={this.props.isDefensiveEditable}
-          onUnitClick={(unit, i) =>
-            this.onUnitClick('defensive', this.props.isDefensiveEditable, unit, i)
-          }
-          onUnitHover={this.props.onUnitHover}
+          isUnitEditable={() => true}
           isSelected={this.props.selectedArmy === 'defensive'}
-          selectedUnit={this.props.selectedUnit}
+          onUnitClick={this.onDefensiveUnitClick}
+          onUnitHover={this.props.onUnitHover}
+
         />
         <BaseCastle/>
         <Army
           units={this.props.player.offensive}
+          selectedUnit={this.props.selectedUnit}
           isShown={this.props.isOffensiveShown}
           isEditable={this.props.isOffensiveEditable}
-          onUnitClick={(unit, i) =>
-            this.onUnitClick('offensive', this.props.isOffensiveEditable, unit, i)
-          }
-          onUnitHover={this.props.onUnitHover}
+          isUnitEditable={this.props.isUnitEditable}
           isSelected={this.props.selectedArmy === 'offensive'}
-          selectedUnit={this.props.selectedUnit}
+          onUnitClick={this.onOffensiveUnitClick}
+          onUnitHover={this.props.onUnitHover}
         />
       </div>
     );
+  }
+
+  onDefensiveUnitClick(unit, i) {
+    this.onUnitClick('defensive', this.props.isDefensiveEditable, unit, i)
+  }
+
+  onOffensiveUnitClick(unit, i) {
+    if (this.props.isUnitEditable(i)) {
+      this.onUnitClick('offensive', this.props.isOffensiveEditable, unit, i)
+    }
   }
 
   onUnitClick(army, isEditable, unit, i ) {
@@ -250,13 +262,14 @@ function Base(props) {
       />
       <BaseMain
         player={props.player}
+        selectedArmy={props.selectedArmy}
+        selectedUnit={props.selectedUnit}
         isDefensiveEditable={props.isDefensiveEditable}
         isOffensiveEditable={props.isOffensiveEditable}
         isOffensiveShown={props.isOffensiveShown}
+        isUnitEditable={props.isUnitEditable}
         onUnitClick={props.onUnitClick}
         onUnitHover={props.onUnitHover}
-        selectedArmy={props.selectedArmy}
-        selectedUnit={props.selectedUnit}
       />
       {props.player.hidden ? <Waiting classes="shown"/> : ""}
     </div>
@@ -271,6 +284,7 @@ export class Game extends React.Component {
     this.onUnitSelected = this.onUnitSelected.bind(this);
     this.nextController = this.nextController.bind(this);
     this.onUnitHover = this.onUnitHover.bind(this);
+    this.isUnitEditable = this.isUnitEditable.bind(this);
     let [controller, myPlayer, opponentPlayer] = startGame(this, player1)
     this.state = {
       myPlayer: myPlayer,
@@ -298,13 +312,14 @@ export class Game extends React.Component {
             player={this.state.myPlayer}
             title="You"
             side="left"
+            selectedArmy={this.state.selectedSlot.army}
+            selectedUnit={this.state.selectedSlot.number}
             isDefensiveEditable={this.state.controller.isDefensiveEditable()}
             isOffensiveEditable={this.state.controller.isOffensiveEditable()}
             isOffensiveShown={this.state.controller.isOffensiveShown()}
+            isUnitEditable={this.isUnitEditable}
             onUnitClick={this.onSlotSelected}
             onUnitHover={this.onUnitHover}
-            selectedArmy={this.state.selectedSlot.army}
-            selectedUnit={this.state.selectedSlot.number}
           />
           <UnitPicker
             isShown={this.state.selectedSlot.number != null}
@@ -365,5 +380,10 @@ export class Game extends React.Component {
       toSet.opponentPlayer = opponentPlayer;
     }
     this.setState(toSet);
+  }
+
+  isUnitEditable(i) {
+    console.log(i, this.state.opponentPlayer.defensive[i].alive)
+    return this.state.opponentPlayer.defensive[i].alive
   }
 };
