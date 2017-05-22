@@ -15,6 +15,7 @@ const nullPlayer = {
   hidden: true
 };
 
+export const allUnitTypes = ["archer", "axeman", "knight", "ninja", "shieldbearer", "swordsman", "viking"]
 export const allUnits = ["archer", "axeman", "knight", "ninja", "shieldbearer", "swordsman", "viking"].map(makeUnit);
 
 export function startGame(game, playerData) {
@@ -30,7 +31,7 @@ export function startGame(game, playerData) {
   const channel = socket.channel("game:public", {});
   channel.on("game:prepare", payload => {
     console.log("Prepare!", payload.me, payload.opponent)
-    // payload.me.defensive = Array(5).fill({type: "archer", alive: true})
+    payload.me.defensive = Array(5).fill({type: "archer", alive: true})
     game.setPlayers(payload.me, payload.opponent);
     game.nextController(new PrepareDefences(game, channel));
   });

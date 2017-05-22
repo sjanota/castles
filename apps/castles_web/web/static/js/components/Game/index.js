@@ -2,7 +2,7 @@ import React from 'react'
 import { Debug } from '../Common'
 import { capitalize } from '../../util'
 import classNames from 'classnames'
-import { startGame, allUnits } from './controller'
+import { startGame, allUnits, allUnitTypes } from './controller'
 
 function randomColor() {
   function number() {
@@ -34,9 +34,52 @@ function plainColor(color, sied) {
   return `rgb(${color})`
 }
 
+function getNextUnit(unit, distance) {
+  const myI = allUnitTypes.indexOf(unit);
+  const normalize = i => allUnitTypes[(myI + i) % allUnitTypes.length].toUpperCase();
+  return normalize(distance)
+}
+
+function iKill(unit) {
+  return getNextUnit(unit, 1);
+}
+
+function killsMe(unit) {
+  return [2, 3].map(i => getNextUnit(unit, i))
+}
+
+function UnitLegend(props) {
+  const classes = classNames({highlight: props.hoveredUnit === props.type});
+  return (
+    <tr
+      className={classes}
+      onMouseEnter={() => props.onHover(props.type)}
+      onMouseLeave={() => props.onHover(null)}
+    >
+      <th>{props.type.toUpperCase()}</th>
+      <th>{killsMe(props.type).map(u => <span>{u}</span>)}</th>
+      <th>{iKill(props.type)}</th>
+    </tr>
+  );
+}
+
 function GameStatus(props) {
   return (
     <div className="status">
+      <table className="legend">
+        <tbody>
+          <tr className="header">
+            <th>Attacker</th>
+            <th>Killed by</th>
+            <th>Kills</th>
+          </tr>
+        </tbody>
+        {allUnitTypes.map(type => <tbody key={type}><UnitLegend
+          type={type}
+          hoveredUnit={props.hoveredUnit}
+          onHover={props.onUnitHover}
+        /></tbody>)}
+      </table>
       <p>{props.message}</p>
     </div>
   );
@@ -47,7 +90,8 @@ function Unit(props) {
   const unitClasses = classNames('unit', {
     'mirror': props.unit.type !== "unknown",
     dead: !props.unit.alive,
-    alive: props.unit.alive
+    alive: props.unit.alive,
+    selected: props.isSelected
   });
   return (
     <div className={unitClasses}>
@@ -57,7 +101,9 @@ function Unit(props) {
         height="50"
         src={"images/" + props.unit.type + ".png"}
         alt={capitalizedUnit}
-        title={capitalizedUnit}
+        title={`${capitalizedUnit}\nKills: ${iKill(props.unit.type)}\nKilled by: ${killsMe(props.unit.type)}`}
+        onMouseEnter={() => props.onHover(props.unit.type)}
+        onMouseLeave={() => props.onHover(null)}
       />
       {!props.unit.alive ? <p className="killed-overlay"></p> : ""}
     </div>
@@ -67,14 +113,17 @@ function Unit(props) {
 function Army(props) {
   const armyClasses = classNames('army', 'my-column', {
     'not-shown': !props.isShown,
-    editable: props.isEditable
+    editable: props.isEditable,
+    selected: props.isSelected
   });
   return (
     <div className={armyClasses}>
       {props.units.map((unit, i) =>
         <Unit key={i}
+          isSelected={props.selectedUnit === i}
           unit={unit}
           onClick={() => props.onUnitClick(unit, i)}
+          onHover={props.onUnitHover}
         />
       )}
     </div>
@@ -93,6 +142,8 @@ function UnitPicker(props) {
         isShown={props.isShown}
         isEditable={false}
         onUnitClick={props.onUnitClick}
+        onUnitHover={props.onUnitHover}
+        isSelected={false}
       />
     </div>
   );
@@ -156,6 +207,9 @@ class BaseMain extends React.Component {
           onUnitClick={(unit, i) =>
             this.onUnitClick('defensive', this.props.isDefensiveEditable, unit, i)
           }
+          onUnitHover={this.props.onUnitHover}
+          isSelected={this.props.selectedArmy === 'defensive'}
+          selectedUnit={this.props.selectedUnit}
         />
         <BaseCastle/>
         <Army
@@ -165,6 +219,9 @@ class BaseMain extends React.Component {
           onUnitClick={(unit, i) =>
             this.onUnitClick('offensive', this.props.isOffensiveEditable, unit, i)
           }
+          onUnitHover={this.props.onUnitHover}
+          isSelected={this.props.selectedArmy === 'offensive'}
+          selectedUnit={this.props.selectedUnit}
         />
       </div>
     );
@@ -197,6 +254,9 @@ function Base(props) {
         isOffensiveEditable={props.isOffensiveEditable}
         isOffensiveShown={props.isOffensiveShown}
         onUnitClick={props.onUnitClick}
+        onUnitHover={props.onUnitHover}
+        selectedArmy={props.selectedArmy}
+        selectedUnit={props.selectedUnit}
       />
       {props.player.hidden ? <Waiting classes="shown"/> : ""}
     </div>
@@ -210,13 +270,15 @@ export class Game extends React.Component {
     this.onSlotSelected = this.onSlotSelected.bind(this);
     this.onUnitSelected = this.onUnitSelected.bind(this);
     this.nextController = this.nextController.bind(this);
+    this.onUnitHover = this.onUnitHover.bind(this);
     let [controller, myPlayer, opponentPlayer] = startGame(this, player1)
     this.state = {
       myPlayer: myPlayer,
       opponentPlayer: opponentPlayer,
       myTurn: true,
       unitPickerActive: false,
-      selectedSlot: null,
+      selectedSlot: {army: null, unit: null},
+      hoveredUnit: null,
       controller: controller
     };
   };
@@ -227,6 +289,8 @@ export class Game extends React.Component {
         <h3>Game</h3>
         <GameStatus
           message={this.state.controller.getStatus(this.state)}
+          hoveredUnit={this.state.hoveredUnit}
+          onUnitHover={this.onUnitHover}
         />
         {this.state.controller.renderControlls(this.state)}
         <div className="board my-container">
@@ -238,10 +302,14 @@ export class Game extends React.Component {
             isOffensiveEditable={this.state.controller.isOffensiveEditable()}
             isOffensiveShown={this.state.controller.isOffensiveShown()}
             onUnitClick={this.onSlotSelected}
+            onUnitHover={this.onUnitHover}
+            selectedArmy={this.state.selectedSlot.army}
+            selectedUnit={this.state.selectedSlot.number}
           />
           <UnitPicker
-            isShown={this.state.selectedSlot != null}
+            isShown={this.state.selectedSlot.number != null}
             onUnitClick={this.onUnitSelected}
+            onUnitHover={this.onUnitHover}
           />
           <Base
             player={this.state.opponentPlayer}
@@ -251,6 +319,7 @@ export class Game extends React.Component {
             isOffensiveEditable={false}
             isOffensiveShown={true}
             onUnitClick={() => {}}
+            onUnitHover={this.onUnitHover}
           />
         </div>
       </div>
@@ -273,11 +342,15 @@ export class Game extends React.Component {
       army[state.selectedSlot.number] = unit;
       player[armyName] = army;
       return {
-        selectedSlot: null,
+        selectedSlot: {army: null, unit: null},
         myPlayer: player
       }
     });
   };
+
+  onUnitHover(unit) {
+    this.setState({hoveredUnit: unit});
+  }
 
   nextController(controller) {
     this.setState({controller: controller});

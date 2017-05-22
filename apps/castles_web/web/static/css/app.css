@@ -44,7 +44,7 @@ img {max-width:100%;}
 
   border: 1px solid #cccccc;
   -webkit-border-radius: 4px;
-  box-sizing: border-box; 
+  box-sizing: border-box;
 }
 
 .scrollable-list {
@@ -95,10 +95,45 @@ img {max-width:100%;}
   align-content: flex-start;
 }
 
-.game .status {
+.game .status > p {
   text-align: center;
   font-size: 2em;
   color: red;
+}
+
+.game .status .legend .header th {
+  font-weight: bold;
+}
+
+.game .status .legend {
+  width: 100%;
+  margin: 5px 0px;
+  border-collapse: collapse;
+}
+
+.game .status .legend th:first-child {
+  border-left: 0px;
+}
+
+.game .status .legend th:last-child {
+  border-right: 0px;
+}
+
+.game .status .legend th {
+  padding-right: 10px;
+  font-weight: lighter;
+  border-left: 1px solid #e5e5e5;
+  border-right: 1px solid #e5e5e5;
+  padding: 0px 5px;
+}
+
+.game .status .legend th span {
+  display: inline-block;
+  width: 50%;
+}
+
+.game .status .legend tr.highlight {
+  background-color: #dddddd;
 }
 
 .board .player-base .header {
@@ -132,6 +167,11 @@ img {max-width:100%;}
 .army .unit {
   position: relative;
   overflow: hidden;
+  border: 2px solid rgba(0,0,0,0.0);
+}
+
+.army.selected .unit.selected {
+  border: 2px solid red;
 }
 
 .army .unit.dead {
@@ -235,6 +275,8 @@ button[disabled]{
 .game .player-base {
   padding: 10px 10px;
   max-height: 100%;
+  max-width: 250px;
+  width: 250px;
 }
 
 .hiddable.not-shown {
