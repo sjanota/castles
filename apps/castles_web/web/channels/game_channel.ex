@@ -21,7 +21,13 @@ defmodule CastlesWeb.GameChannel do
 
   def handle_in("player:prepared", defences, socket) do
     Logger.info "Player prepared: #{inspect defences}"
-    call_game(:player_defence_ready, [defences])
+    :ok = call_game(:player_defence_ready, [defences])
+    {:noreply, socket}
+  end
+
+  def handle_in("player:attack", attack, socket) do
+    Logger.info "Player prepared: #{inspect attack}"
+    :ok = call_game(:player_attack, [attack])
     {:noreply, socket}
   end
 

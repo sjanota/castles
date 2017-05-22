@@ -36,7 +36,7 @@ img {max-width:100%;}
 
 .debug > h4 > button {
   display: inline-block;
-  padding: 0px 5px 0px 5px; /* Padding por defecto */
+  padding: 0px 5px 0px 5px;
   text-align: center;
   vertical-align: middle;
 
@@ -44,7 +44,7 @@ img {max-width:100%;}
 
   border: 1px solid #cccccc;
   -webkit-border-radius: 4px;
-  box-sizing: border-box; /* <- added this */
+  box-sizing: border-box; 
 }
 
 .scrollable-list {
@@ -91,6 +91,10 @@ img {max-width:100%;}
   background-color: #eeeeee;
 }
 
+.battle-ground {
+  align-content: flex-start;
+}
+
 .game .status {
   text-align: center;
   font-size: 2em;
@@ -120,10 +124,6 @@ img {max-width:100%;}
   margin-bottom: 0px;
 }
 
-.battle-ground {
-  align-content: flex-start;
-}
-
 .board .player-base .main {
   display: flex;
   justify-content: center;
@@ -138,6 +138,10 @@ img {max-width:100%;}
   background: radial-gradient(rgba(255, 0, 0, 0.5), rgba(255, 0, 0, 0.5), rgba(255, 0, 0, 0.5), rgba(255, 0, 0, 0.5), rgba(0,0,0,0.0), rgba(0,0,0,0.0), rgba(0,0,0,0.0));
 }
 
+.army .unit img {
+  position: relative;
+}
+
 .army .unit .killed-overlay {
   position: absolute;
   top: 0px;
@@ -147,7 +151,7 @@ img {max-width:100%;}
   line-height: 50px;
 }
 
-.killed-overlay:before, .killed-overlay:after {
+.army .unit .killed-overlay:before, .army .unit .killed-overlay:after {
   position: absolute;
   left: 23px;
   top: -11px;
@@ -156,16 +160,13 @@ img {max-width:100%;}
   width: 5px;
   background-color: #ff0000;
 }
-.killed-overlay:before {
+
+.army .unit .killed-overlay:before {
   transform: rotate(45deg);
 }
-.killed-overlay:after {
+
+.army .unit .killed-overlay:after {
   transform: rotate(-45deg);
-}
-
-
-.army .unit img {
-  position: relative;
 }
 
 .unit-picker {
@@ -188,18 +189,6 @@ img {max-width:100%;}
   max-width: 50px;
 }
 
-.unit-picker.not-shown {
-  border: 3px solid rgba(0,0,0,0.0);
-}
-
-.unit-picker.not-shown .unit {
-  border: 1px solid rgba(0,0,0,0.0);
-}
-
-.game .controls {
-  margin-bottom: 10px;
-}
-
 div.right .my-container {
   flex-flow: row-reverse;
 }
@@ -212,11 +201,12 @@ div.left .align {
   text-align: left;
 }
 
-div.right.mirror img {
+div.right img.mirror {
   transform: scaleX(-1);
 }
 
 .game .controls {
+  margin-bottom: 10px;
   display: flex;
   justify-content: center;
 }
@@ -249,15 +239,13 @@ button[disabled]{
 
 .hiddable.not-shown {
   background: none;
+  border-color: rgba(0,0,0,0.0);
 }
 
-.hiddable.not-shown * {
+.hiddable.not-shown *:not(.shown) {
   background: none;
   visibility: hidden;
-}
-
-.hiddable .shown {
-  visibility: visible;
+  border-color: rgba(0,0,0,0.0);
 }
 
 .centerable {

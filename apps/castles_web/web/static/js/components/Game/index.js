@@ -2,13 +2,7 @@ import React from 'react'
 import { Debug } from '../Common'
 import { capitalize } from '../../util'
 import classNames from 'classnames'
-import { startGame } from './controller'
-
-const initArmy = Array(5).fill(makeUnit("empty"));
-function makeUnit(type, alive) {
-  alive = alive !== false ? true : false
-  return {type: type, alive: alive}
-};
+import { startGame, allUnits } from './controller'
 
 function randomColor() {
   function number() {
@@ -18,18 +12,9 @@ function randomColor() {
 }
 
 const player1 = {
-  name: Math.random().toString(36).substr(2, 10),
-  defensive: initArmy,
-  offensive: initArmy,
+  // name: Math.random().toString(36).substr(2, 10),
+  name: prompt("Your name, My Lord:"),
   color: randomColor()
-};
-
-const nullPlayer = {
-  name: '',
-  defensive: initArmy,
-  offensive: initArmy,
-  color: "0,0,0",
-  hidden: true
 };
 
 function gradientColor(color, side) {
@@ -48,8 +33,6 @@ function gradientColor(color, side) {
 function plainColor(color, sied) {
   return `rgb(${color})`
 }
-
-const allUnits = ["archer", "axeman", "knight", "ninja", "shieldbearer", "swordsman", "viking", "empty"].map(makeUnit);
 
 function GameStatus(props) {
   return (
@@ -133,7 +116,7 @@ function BaseHeader(props) {
         title={props.title}
       />
       <div className="my-container">
-        <span>Defensive</span><span>Attack</span>
+        <span>Defence</span><span>Attack</span>
       </div>
     </div>
   );
@@ -227,13 +210,14 @@ export class Game extends React.Component {
     this.onSlotSelected = this.onSlotSelected.bind(this);
     this.onUnitSelected = this.onUnitSelected.bind(this);
     this.nextController = this.nextController.bind(this);
+    let [controller, myPlayer, opponentPlayer] = startGame(this, player1)
     this.state = {
-      myPlayer: player1,
-      opponentPlayer: nullPlayer,
+      myPlayer: myPlayer,
+      opponentPlayer: opponentPlayer,
       myTurn: true,
       unitPickerActive: false,
       selectedSlot: null,
-      controller: startGame(this, player1)
+      controller: controller
     };
   };
 
