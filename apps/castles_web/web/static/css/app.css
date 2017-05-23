@@ -6,6 +6,14 @@ img {max-width:100%;}
   color: red;
 }
 
+.lobby .player-list li.selected {
+  background: #dddddd;
+}
+
+.lobby .player-list li {
+  cursor: default;
+}
+
 .game .controls {
   min-height: 32px;
 }
@@ -54,8 +62,9 @@ img {max-width:100%;}
   overflow-y: scroll;
 }
 
-.scrollable-list li {
+.scrollable-list li div {
   padding: 1px 5px;
+  border-bottom: 1px #888888 solid;
 }
 
 .scrollable-list li:hover {
@@ -67,7 +76,7 @@ img {max-width:100%;}
 }
 
 .player-list {
-  width: 300px;
+  width: 250px;
   height: 400px;
 }
 
@@ -80,6 +89,7 @@ img {max-width:100%;}
   display: flex;
   flex-flow: column;
   justify-content: space-around;
+  align-items: center;
 }
 
 .board .castle {
@@ -303,4 +313,25 @@ button[disabled]{
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+img.centered, button.centered {
+  display: block;
+  margin: auto;
+}
+
+.dialog .overlay {
+  background-color: rgba(0,0,0,0.5);
+  position:fixed;
+  width:100%;
+  height:100%;
+  top:0px;
+  left:0px;
+  z-index:1000;
+}
+
+.dialog .overlay .box {
+  opacity: 1.0;
+  background-color: #ffffff;
+  padding: 20px;
 }

@@ -1,12 +1,13 @@
 import React from 'react'
 import {createController} from './controller'
+import {gradientColor} from '../../util'
 
 function Controls(props) {
   return (
     <div>
       <h4>Controls:</h4>
       <button
-        onClick={props.challenge}
+        onClick={props.onChallenge}
         disabled={!props.selectedPlayer}
       >Challenge!</button>
     </div>
@@ -29,15 +30,32 @@ function PlayerList(props) {
     <div>
       <h4>Opponents:</h4>
       <ul className="scrollable-list player-list">
-        {props.players.map((player) => {
+        {Object.keys(props.players).map((playerName) => {
+          const player = props.players[playerName];
+          const styles = {
+            background: gradientColor(player.color, 'left')
+          };
           return <li
             key={player.name}
             onClick={() => props.onPlayerClick(player)}
             className={player === props.selectedPlayer ? "selected" : ""}
-          >{player.name}</li>
+          ><div style={styles}>{player.name}</div></li>
         })}
       </ul>
     </div>
+  );
+}
+
+function LoginLine(props) {
+  return (
+    <p>
+      Logged as '{props.playerData.name}'
+      <button
+        onClick={props.onLogout}
+        className="small"
+        style={{marginLeft: '20px'}}
+      >Logout</button>
+    </p>
   );
 }
 
@@ -46,9 +64,15 @@ export class Lobby extends React.Component {
     super();
     this.onPlayerClick = this.onPlayerClick.bind(this);
     this.onChallenge = this.onChallenge.bind(this);
+    this.onLogout = this.onLogout.bind(this);
+    this.onChallengeAccepted = this.onChallengeAccepted.bind(this);
+    this.onChallengeDeclined = this.onChallengeDeclined.bind(this);
+    this.addPlayers = this.addPlayers.bind(this);
+    this.removePlayers = this.removePlayers.bind(this);
+    this.awaitChallengeRespnse = this.awaitChallengeRespnse.bind(this);
     this.state = {
       selectedPlayer: null,
-      players: [],
+      players: {},
       controller: createController(this, props.socket)
     };
   }
@@ -57,7 +81,10 @@ export class Lobby extends React.Component {
     return (
       <div className="lobby">
         <h3>Lobby</h3>
-        <p>Logged as '{this.props.playerData.name}'</p>
+        <LoginLine
+          playerData={this.props.playerData}
+          onLogout={this.onLogout}
+        />
         <div className="my-container">
           <PlayerList
             players={this.state.players}
@@ -81,10 +108,101 @@ export class Lobby extends React.Component {
   }
 
   onComunicationError(reason) {
+    this.state.controller.onLeave();
     this.props.onLogout(`Lobby communication error: ${reason}`)
   }
 
-  onChallenge() {
+  onLogout() {
+    this.state.controller.onLeave();
+    this.props.onLogout();
+  }
 
+  onChallenge() {
+    this.state.controller.beginChallenge(this.state);
+  }
+
+  addPlayers(newPlayers) {
+    newPlayers = newPlayers.filter(p => p.name != this.props.playerData.name)
+    this.setState(state => {
+      const players = Object.assign({}, state.players);
+      for (let player of newPlayers) {
+        players[player.name] = player;
+      };
+      return {players: players};
+    });
+  }
+
+  removePlayers(removePlayers) {
+    this.setState(state => {
+      const players = Object.assign({}, state.players);
+      for (let player of removePlayers) {
+        delete players[player.name];
+      };
+      return {players: players};
+    });
+  }
+
+  awaitChallengeRespnse() {
+    this.props.showDialog(<div className="my-column" style={{width: '300px'}}>
+      <p>Awaiting response to challenge from '{this.state.selectedPlayer.name}'</p>
+      <img className="centered" src="images/ajax-loader.gif"/>
+    </div>);
+  }
+
+  onIncommingCallenge(challengedBy) {
+    function accept() {
+      this.props.showDialog(<div className="my-column" style={{width: '300px'}}>
+        <p>Awaiting game data</p>
+        <img className="centered" src="images/ajax-loader.gif"/>
+      </div>)
+      this.state.controller.acceptChallenge(challengedBy);
+    }
+    accept = accept.bind(this);
+
+    function decline() {
+      this.props.hideDialog()
+      this.state.controller.declineChallenge(challengedBy);
+    }
+    decline = decline.bind(this);
+
+    this.props.showDialog(<div className="my-column" style={{width: '300px'}}>
+      <p>You are challenged by '{challengedBy}'!</p>
+      <p>Would you like to accept the challenge?</p>
+      <div>
+        <button onClick={accept}>Accept</button>
+        <button onClick={decline} style={{marginLeft: '20px'}}>Decline</button>
+      </div>
+    </div>)
+  }
+
+  onChallengeAccepted(challengedBy) {
+    function ok() {
+      this.props.hideDialog();
+      let gameId = this.state.controller.startChallenge(this.props.playerData, challengedBy);
+      this.state.controller.onLeave();
+      this.props.onGameStarted(gameId);
+    }
+    ok = ok.bind(this);
+    this.props.showDialog(<div className="my-column" style={{width: '300px'}}>
+      <p>Challenge has been accepted!</p>
+      <button className="centered" onClick={ok}>OK</button>
+    </div>);
+  }
+
+  onChallengeDeclined() {
+    function ok() {
+      this.props.hideDialog();
+    }
+    ok = ok.bind(this);
+    this.props.showDialog(<div className="my-column" style={{width: '300px'}}>
+      <p>Challenge has been declined</p>
+      <button className="centered" onClick={ok}>OK</button>
+    </div>);
+  }
+
+  onChallengeStarted(gameId) {
+    this.props.hideDialog();
+    this.state.controller.onLeave();
+    this.props.onGameStarted(gameId);
   }
 }

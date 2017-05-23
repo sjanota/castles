@@ -3,6 +3,7 @@ defmodule CastlesWeb.GameSocket do
 
   ## Channels
   channel "game:*", CastlesWeb.GameChannel
+  channel "lobby:public", CastlesWeb.LobbyChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
@@ -36,5 +37,9 @@ defmodule CastlesWeb.GameSocket do
   #     CastlesWeb.Endpoint.broadcast("users_socket:#{user.id}", "disconnect", %{})
   #
   # Returning `nil` makes this socket anonymous.
-  def id(_socket), do: nil
+  def id(socket), do: "player_socket:#{socket.assigns.name}"
+
+  def notify_player(name, event, data) do
+    CastlesWeb.Endpoint.broadcast("player_socket:#{name}", event, data)
+  end
 end

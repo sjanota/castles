@@ -24,8 +24,8 @@ export function rgbDecToHex(dec) {
 export function gradientColor(color, side) {
   const rgb = `rgba(${rgbHexToDec(color).join()},`;
   const parts = [
-    '#ffffff',
-    '#ffffff',
+    'rgba(0,0,0,0.0)',
+    'rgba(0,0,0,0.0)',
     `${rgb}0.6)`,
     `${rgb}1.0)`,
     `${rgb}1.0)`

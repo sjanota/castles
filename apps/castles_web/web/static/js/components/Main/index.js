@@ -10,11 +10,15 @@ export class Main extends React.Component {
     super();
     this.onLogin = this.onLogin.bind(this);
     this.onLogout = this.onLogout.bind(this);
+    this.onGameStarted = this.onGameStarted.bind(this);
+    this.showDialog = this.showDialog.bind(this);
+    this.hideDialog = this.hideDialog.bind(this);
     this.state = {
       error: null,
       playerData: null,
-      isGameInProgress: false,
-      socket: null
+      gameId: null,
+      socket: null,
+      dialog: null
     };
   }
 
@@ -23,6 +27,7 @@ export class Main extends React.Component {
       <div>
         <h2>Castles!</h2>
         {this.getCurrentPage()}
+        {this.state.dialog ? this.state.dialog : ""}
       </div>
     );
   }
@@ -30,7 +35,7 @@ export class Main extends React.Component {
   getCurrentPage() {
     if (!this.state.playerData) {
       return this.pageLogin();
-    } else if (!this.state.isGameInProgress) {
+    } else if (!this.state.gameId) {
       return this.pageLobby()
     } else {
       return this.pageGame();
@@ -54,6 +59,12 @@ export class Main extends React.Component {
     });
   }
 
+  onGameStarted(gameId) {
+    this.setState({
+      gameId: gameId
+    });
+  }
+
   pageLogin() {
     return (
       <Login
@@ -69,6 +80,9 @@ export class Main extends React.Component {
         playerData={this.state.playerData}
         socket={this.state.socket}
         onLogout={this.onLogout}
+        showDialog={this.showDialog}
+        hideDialog={this.hideDialog}
+        onGameStarted={this.onGameStarted}
       />
     );
   }
@@ -89,6 +103,23 @@ export class Main extends React.Component {
     }});
     socket.connect();
     return socket;
+  }
+
+  showDialog(dialogContent) {
+    const dialog = (
+      <div className="dialog">
+        <div className="overlay centerable">
+          <div className="box center">
+            {dialogContent}
+          </div>
+        </div>
+      </div>
+    );
+    this.setState({dialog: dialog});
+  }
+
+  hideDialog() {
+    this.setState({dialog: null});
   }
 
 }

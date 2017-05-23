@@ -8,25 +8,23 @@ defmodule CastlesWeb.GameChannel do
       color: socket.assigns.color
     }
     Process.put :game_id, game_id
-    {:ok, state} = call_game(:connect, [data])
-    Logger.info "respond with #{inspect state}"
-    {:ok, state, socket}
+    case call_game(:connect, [data]) do
+      {:ok, state} -> {:ok, state, socket}
+      {:error, reason} -> {:error, %{"reason" => reason}}
+    end
   end
 
   def handle_info({:game, event, data}, socket) do
-    Logger.info "push event #{event} : #{inspect data}"
     push socket, event, data
     {:noreply, socket}
   end
 
   def handle_in("player:prepared", defences, socket) do
-    Logger.info "Player prepared: #{inspect defences}"
     :ok = call_game(:player_defence_ready, [defences])
     {:noreply, socket}
   end
 
   def handle_in("player:attack", attack, socket) do
-    Logger.info "Player prepared: #{inspect attack}"
     :ok = call_game(:player_attack, [attack])
     {:noreply, socket}
   end

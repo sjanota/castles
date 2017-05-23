@@ -10,6 +10,7 @@ defmodule CastlesWeb do
     children = [
       # Start the endpoint when the application starts
       supervisor(CastlesWeb.Endpoint, []),
+      supervisor(CastlesWeb.Presence, []),
       # Start your own worker by calling: CastlesWeb.Worker.start_link(arg1, arg2, arg3)
       # worker(CastlesWeb.Worker, [arg1, arg2, arg3]),
     ]
