@@ -282,7 +282,6 @@ export class Game extends React.Component {
   render() {
     return (
       <div className="game">
-        <h3>Game</h3>
         <GameStatus
           message={this.state.controller.getStatus(this.state)}
           hoveredUnit={this.state.hoveredUnit}

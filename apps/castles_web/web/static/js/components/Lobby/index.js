@@ -1,59 +1,90 @@
 import React from 'react'
-import { Debug } from '../Common'
-import { PlayerList } from './player_list'
-import { PlayerStats } from './player_stats'
-import { Controls } from './controls'
+import {createController} from './controller'
+
+function Controls(props) {
+  return (
+    <div>
+      <h4>Controls:</h4>
+      <button
+        onClick={props.challenge}
+        disabled={!props.selectedPlayer}
+      >Challenge!</button>
+    </div>
+  );
+}
+
+function PlayerStats(props) {
+  return (
+    <div>
+      {!props.player ? "" : <div>
+        <h4>Player: '{props.player.name}'</h4>
+        <p>Points: {props.player.points}</p>
+      </div>}
+    </div>
+  );
+}
+
+function PlayerList(props) {
+  return (
+    <div>
+      <h4>Opponents:</h4>
+      <ul className="scrollable-list player-list">
+        {props.players.map((player) => {
+          return <li
+            key={player.name}
+            onClick={() => props.onPlayerClick(player)}
+            className={player === props.selectedPlayer ? "selected" : ""}
+          >{player.name}</li>
+        })}
+      </ul>
+    </div>
+  );
+}
 
 export class Lobby extends React.Component {
-  constructor() {
+  constructor(props) {
     super();
-    this.setActivePlayer = this.setActivePlayer.bind(this)
-    this.challengeActivePlayer = this.challengeActivePlayer.bind(this)
+    this.onPlayerClick = this.onPlayerClick.bind(this);
+    this.onChallenge = this.onChallenge.bind(this);
     this.state = {
-      debug: true,
-      activePlayer: 0
-    }
+      selectedPlayer: null,
+      players: [],
+      controller: createController(this, props.socket)
+    };
   }
 
   render() {
     return (
       <div className="lobby">
         <h3>Lobby</h3>
-        {this.state.debug ? this.debug() : ''}
-        <h4>Logged as '{this.props.login}'</h4>
+        <p>Logged as '{this.props.playerData.name}'</p>
         <div className="my-container">
           <PlayerList
-            players={this.props.players}
-            activePlayerNo={this.state.activePlayer}
-            setActivePlayer={this.setActivePlayer}
+            players={this.state.players}
+            selectedPlayer={this.state.selectedPlayer}
+            onPlayerClick={this.onPlayerClick}
           />
           <PlayerStats
-            player={this.getActivePlayer()}
+            player={this.state.selectedPlayer}
           />
           <Controls
-            challenge={this.challengeActivePlayer}
+            selectedPlayer={this.state.selectedPlayer}
+            onChallenge={this.onChallenge}
           />
         </div>
       </div>
     );
   }
 
-  setActivePlayer(activePlayer) {
-    this.setState({activePlayer: activePlayer})
+  onPlayerClick(selectedPlayer) {
+    this.setState({selectedPlayer: selectedPlayer});
   }
 
-  getActivePlayer() {
-    return this.props.players[this.state.activePlayer]
+  onComunicationError(reason) {
+    this.props.onLogout(`Lobby communication error: ${reason}`)
   }
 
-  challengeActivePlayer() {
+  onChallenge() {
 
-  }
-
-  debug() {
-    return (
-      <Debug>
-      </Debug>
-    );
   }
 }

@@ -3,7 +3,7 @@ import { Field, Error, UserInput } from '../Common'
 import { rgbHexToDec, rgbDecToHex, gradientColor, randomColor } from '../../util'
 
 export class Login extends React.Component {
-  constructor() {
+  constructor(props) {
     super();
     this.setError = this.setError.bind(this);
     this.onNameChange = this.onNameChange.bind(this);
@@ -11,7 +11,7 @@ export class Login extends React.Component {
     this.onRandomColor = this.onRandomColor.bind(this);
     this.onLogin = this.onLogin.bind(this);
     this.state = {
-      error: '',
+      error: props.error,
       debug: true,
       name: '',
       color: '#ffffff'
