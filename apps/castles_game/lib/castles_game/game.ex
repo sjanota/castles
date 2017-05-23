@@ -254,12 +254,6 @@ defmodule CastlesGame.Game do
     order_units(rest, unit, [other_unit | acc])
   end
 
-  defp clear_defender_offensive(state) do
-    [attacker, defender] = state.players
-    defender = Player.clear_offensive(defender)
-    Map.put(state, :players, [attacker, defender])
-  end
-
   defp game_end(state) do
     [attacker, defender] = state.players
     Player.notify("game:win", attacker, defender)

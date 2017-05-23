@@ -1,61 +1,89 @@
 import React from 'react'
 import { Field, Error, UserInput } from '../Common'
-import { Debug } from '../Common'
+import { rgbHexToDec, rgbDecToHex, gradientColor, randomColor } from '../../util'
 
 export class Login extends React.Component {
   constructor() {
     super();
-    this.setError = this.setError.bind(this)
-    this.handleLoginChange = this.handleLoginChange.bind(this)
-    this.handleLogin = this.handleLogin.bind(this)
+    this.setError = this.setError.bind(this);
+    this.onNameChange = this.onNameChange.bind(this);
+    this.onColorChange = this.onColorChange.bind(this);
+    this.onRandomColor = this.onRandomColor.bind(this);
+    this.onLogin = this.onLogin.bind(this);
     this.state = {
       error: '',
       debug: true,
-      login: ''
-    }
+      name: '',
+      color: '#ffffff'
+    };
   }
 
   render() {
+    const styles = {
+      background: gradientColor(this.state.color, 'left'),
+    }
     return (
-      <div className="login">
+      <div className="login" style={styles}>
         <h3>Login</h3>
-        {this.state.debug ? this.debug() : ''}
-
-        <p className="username-input">
-          Login: <input value={this.state.login} onChange={this.handleLoginChange} />
-          {this.state.error ? <Error value={this.state.error}/> : ''}
-        </p>
-        <button onClick={this.handleLogin}>Login</button>
+        <div>
+          <p>
+            Welcome My Lord, in the realm of Castles! Pleasem give us more
+            information about Your Majesty.
+          </p>
+          <div>
+            {this.state.error ? <p className="error">Error: {this.state.error}</p> : ""}
+            <p>
+              Name: <input
+                value={this.state.name}
+                onChange={this.onNameChange}
+              />
+            </p>
+            <p>
+              Color: <input
+                type="color"
+                onChange={this.onColorChange}
+                value={this.state.color}
+              />
+              <button
+                style={{'marginLeft': '20px'}}
+                className="small"
+                onClick={this.onRandomColor}
+              >Random</button>
+            </p>
+          </div>
+        </div>
+        <button onClick={this.onLogin}>Login</button>
       </div>
     );
   }
 
-  handleLoginChange(e) {
-    this.setState({login: e.target.value})
+  onNameChange(e) {
+    this.setState({name: e.target.value})
+  }
+
+  onColorChange(e) {
+    this.setState({color: e.target.value})
+  }
+
+  onRandomColor() {
+    let color = [255,255,255];
+    while (color.every(i => i === 255)) {
+      color = randomColor();
+    }
+    this.setState({color: rgbDecToHex(color)});
   }
 
   setError(err) {
     this.setState({error: err})
   }
 
-  handleLogin() {
-    // Login
-  }
-
-  debug() {
-    const toggleError = () => {
-      if(this.state.error) {
-        this.setError(null)
-      } else {
-        this.setError("artificial error")
-      }
+  onLogin() {
+    if (this.state.name === '') {
+      this.setError("Provide name, My Lord.");
+    } else if (this.state.color === '#ffffff') {
+      this.setError("Choose your color, My Lord.");
     }
-    return (
-      <Debug>
-        <p><button onClick={toggleError}>Toggle error</button></p>
-        <p><Field name="User name" value={this.state.login} /></p>
-      </Debug>
-    );
+    this.props.onLogin({name: this.state.name, color: this.state.color})
   }
 
 }

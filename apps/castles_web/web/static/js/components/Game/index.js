@@ -1,38 +1,14 @@
 import React from 'react'
 import { Debug } from '../Common'
-import { capitalize } from '../../util'
+import { capitalize, gradientColor, plainColor, randomColor } from '../../util'
 import classNames from 'classnames'
 import { startGame, allUnits, allUnitTypes } from './controller'
-
-function randomColor() {
-  function number() {
-    return Math.floor(Math.random() * 256)
-  }
-  return `${number()},${number()},${number()}`
-}
 
 const player1 = {
   name: Math.random().toString(36).substr(2, 10),
   // name: prompt("Your name, My Lord:"),
   color: randomColor()
 };
-
-function gradientColor(color, side) {
-  const rgb = `rgba(${color},`;
-  const parts = [
-    '#ffffff',
-    '#ffffff',
-    `${rgb}0.6)`,
-    `${rgb}1.0)`,
-    `${rgb}1.0)`
-  ];
-  const angle = side === "left" ? '45deg' : '-45deg';
-  return `linear-gradient(${angle},${parts.join(',')})`;
-}
-
-function plainColor(color, sied) {
-  return `rgb(${color})`
-}
 
 function getNextUnit(unit, distance) {
   const myI = allUnitTypes.indexOf(unit);
@@ -283,7 +259,7 @@ function Base(props) {
 }
 
 export class Game extends React.Component {
-  constructor() {
+  constructor(props) {
     super();
     this.switchActivePlayer = this.switchActivePlayer.bind(this);
     this.onSlotSelected = this.onSlotSelected.bind(this);
@@ -291,7 +267,7 @@ export class Game extends React.Component {
     this.nextController = this.nextController.bind(this);
     this.onUnitHover = this.onUnitHover.bind(this);
     this.isUnitEditable = this.isUnitEditable.bind(this);
-    let [controller, myPlayer, opponentPlayer] = startGame(this, player1)
+    let [controller, myPlayer, opponentPlayer] = startGame(this, props.socket, props.playerData)
     this.state = {
       myPlayer: myPlayer,
       opponentPlayer: opponentPlayer,

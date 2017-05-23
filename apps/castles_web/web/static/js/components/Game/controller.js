@@ -1,5 +1,4 @@
 import React from 'react'
-import {Socket} from "phoenix"
 
 const initArmy = Array(5).fill(makeUnit("empty"));
 function makeUnit(type, alive) {
@@ -38,16 +37,11 @@ function fillRandomly(units, indexes) {
   }
 }
 
-export function startGame(game, playerData) {
+export function startGame(game, socket, playerData) {
   const myPlayer = Object.assign({
     offensive: initArmy.slice(),
     defensive: initArmy.slice()
   }, playerData)
-  const socket =  new Socket("/game", {params: {
-    name: myPlayer.name,
-    color: myPlayer.color
-  }});
-  socket.connect();
   const channel = socket.channel("game:public", {});
   channel.on("game:prepare", payload => {
     console.log("Prepare!", payload.me, payload.opponent)

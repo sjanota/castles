@@ -3,6 +3,7 @@ import { Login } from '../Login'
 import { Lobby } from '../Lobby'
 import { Game } from '../Game'
 import { capitalize } from '../../util'
+import {Socket} from "phoenix"
 
 const playerList = [
   {name: "aaa", points: 123},
@@ -32,7 +33,7 @@ const pages = Object.keys(pagesMap)
 class SwitchPage extends React.Component {
   constructor() {
     super();
-    this.handleChange = this.handleChange.bind(this)
+    this.onLogin = this.onLogin.bind(this)
   }
 
   render() {
@@ -58,9 +59,11 @@ class SwitchPage extends React.Component {
 export class Main extends React.Component {
   constructor() {
     super();
-    this.setPage = this.setPage.bind(this)
+    this.onLogin = this.onLogin.bind(this)
     this.state = {
-      page: pages[2]
+      playerData: null,
+      gameInProgress: false,
+      socket: null
     }
   }
 
@@ -68,17 +71,38 @@ export class Main extends React.Component {
     return (
       <div>
         <h2>Castles!</h2>
-        <SwitchPage
-          value={this.state.page}
-          values={pages}
-          setPage={this.setPage}
-        />
-        {pagesMap[this.state.page]}
+        {this.getCurrentPage()}
       </div>
     );
   }
 
-  setPage(page) {
-    this.setState({page: page})
+  getCurrentPage() {
+    if (!this.state.playerData) {
+      return <Login onLogin={this.onLogin}/>
+    }
+    return (
+      <Game
+        playerData={this.state.playerData}
+        socket={this.state.socket}
+      />
+    );
   }
+
+  onLogin(playerData) {
+    const socket = this.connect(playerData);
+    this.setState({
+      playerData: playerData,
+      socket: socket
+    });
+  }
+
+  connect(playerData) {
+    const socket =  new Socket("/game", {params: {
+      name: playerData.name,
+      color: playerData.color
+    }});
+    socket.connect();
+    return socket;
+  }
+
 }
